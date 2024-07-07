@@ -15,11 +15,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <main className="min-h-screen w-full flex flex-row">
+      <body>
+        <div className="flex h-screen">
           <Sidebar />
-          {children}
-        </main>
+          <main className="flex-1 bg-gray-100 p-4 overflow-y-auto no-scrollbar">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );
