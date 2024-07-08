@@ -13,8 +13,7 @@ import {
 import { getAll as getAllCategories } from "@/actions/category/actions";
 import { getAll as getAllCompanies } from "@/actions/company/actions";
 import { create as createProduct } from "@/actions/product/actions";
-import { redirect } from "next/navigation";
-
+import { useRouter } from "next/navigation";
 export default function ProductForm() {
   const {
     register,
@@ -26,6 +25,7 @@ export default function ProductForm() {
     resolver: zodResolver(ProductFormSchema),
   });
 
+  const router = useRouter();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [formattedPrice, setFormattedPrice] = useState<string>("");
@@ -51,7 +51,7 @@ export default function ProductForm() {
     }
     await createProduct(data);
     setLoading(false);
-    redirect("/products");
+    router.push("/product");
   };
 
   const companyOptions = companies.map((company) => ({

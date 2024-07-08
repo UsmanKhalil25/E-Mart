@@ -84,7 +84,7 @@ model Purchase{
   paymentOption   PaymentOption
   productPurchase ProductPurchase[]
   fullPayment     FullPayment?
-  installments    Installment?
+  installments    Installment[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 }
@@ -98,11 +98,10 @@ model ProductPurchase {
   purchaseId  Int
   quantity    Int
   price       Int
-  discount    Int?
 }
 
 model FullPayment {
-  id              Int  @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   purchase        Purchase  @relation(fields: [purchaseId], references: [id])
   purchaseId      Int       @unique
   discount        Int?
@@ -112,7 +111,7 @@ model FullPayment {
 model Installment {
   id                  Int       @id @default(autoincrement())
   purchase            Purchase  @relation(fields: [purchaseId], references: [id])
-  purchaseId          Int       @unique
+  purchaseId          Int       
   totalPrice          Int
   downPayment         Int
   remainingPrice      Int

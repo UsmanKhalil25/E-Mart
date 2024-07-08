@@ -26,7 +26,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[] | undefined>(undefined);
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(
-    undefined,
+    undefined
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCompany, setSelectedCompany] = useState<string>("");
@@ -205,6 +205,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
       {selectedProduct && (
         <ProductSelectionForm
           initialPrice={selectedProduct.price}
+          stock={selectedProduct.stock}
           onProductAdd={handleSelectProduct}
         />
       )}

@@ -132,13 +132,13 @@ export const CustomerFormSchema = z.object({
     .string()
     .regex(
       /^\d{4}-\d{7}$/,
-      "Please provide a valid phone number format (e.g., 0331-2340021)",
+      "Please provide a valid phone number format (e.g., 0331-2340021)"
     ),
   CNIC: z
     .string()
     .regex(
       /^\d{5}-\d{8}$/,
-      "Please provide a valid CNIC format (e.g., 34202-00827441)",
+      "Please provide a valid CNIC format (e.g., 34202-00827441)"
     ),
   address: AddressFormSchema.optional(),
 });
@@ -227,9 +227,50 @@ export const PAYMENT_STATUS: {
 export type PAYMENT_STATUS =
   (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS];
 
-export type Purchase = {
+export type PurchaseForm = {
   customerId: number;
   paymentOption: PaymentOption;
   paymentInfo: FullPaymentForm | InstallmentForm;
   products: ProductWithInfo[];
+};
+
+export type Purchase = {
+  id: number;
+  customerId: number;
+  customer: Customer;
+  paymentStatus: PaymentStatus;
+  paymentOption: PaymentOption;
+  productPurchase: ProductPurchase[];
+  fullPayment: FullPayment | null;
+  installments: Installment[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type ProductPurchase = {
+  id: number;
+  productId: number;
+  purchaseId: number;
+  quantity: number;
+  price: number;
+};
+
+export type FullPayment = {
+  id: number;
+  purchaseId: number;
+  discount: number | null;
+  purchaseAmount: number;
+};
+
+export type Installment = {
+  id: number;
+  purchaseId: number;
+  totalPrice: number;
+  downPayment: number;
+  remainingPrice: number;
+  dueDate: Date;
+  paidAt: Date | null;
+  installmentPeriod: number;
+  createdAt: Date;
+  updatedAt: Date;
 };

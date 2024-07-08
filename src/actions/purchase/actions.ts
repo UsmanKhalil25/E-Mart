@@ -3,14 +3,19 @@ import prisma from "@/lib/db";
 import {
   PAYMENT_OPTIONS,
   PAYMENT_STATUS,
-  Purchase,
+  PurchaseForm,
   FullPaymentForm,
   InstallmentForm,
 } from "@/lib/type";
 
-export async function create(newPurchase: Purchase) {
+export async function create(newPurchase: PurchaseForm) {
   if (!newPurchase) {
     return { status: 400, message: "Required data is missing" };
+  }
+  for (const item of newPurchase.products) {
+    if (item.product.stock < item.quantity) {
+      return { status: 400, message: "Not enough stock present" };
+    }
   }
 
   try {
@@ -52,6 +57,14 @@ export async function create(newPurchase: Purchase) {
     }
 
     for (const item of newPurchase.products) {
+      await prisma.product.update({
+        where: {
+          id: item.product.id,
+        },
+        data: {
+          stock: item.product.stock - item.quantity,
+        },
+      });
       await prisma.productPurchase.create({
         data: {
           productId: item.product.id,
@@ -66,4 +79,62 @@ export async function create(newPurchase: Purchase) {
     console.error(error);
     return { status: 500, message: "Something went wrong" };
   }
+}
+
+export async function getAll(page = 1, pageSize = 10) {
+  const skip = (page - 1) * pageSize;
+
+  const results = await prisma.purchase.findMany({
+    skip: skip,
+    take: pageSize,
+    include: {
+      customer: {
+        select: { firstName: true, lastName: true, phoneNumber: true },
+      },
+
+      productPurchase: true,
+    },
+  });
+
+  const totalCount = await prisma.product.count();
+  let response = [];
+  for (const result of results) {
+    const {
+      customer,
+      productPurchase,
+      paymentOption,
+      paymentStatus,
+      ...purchaseData
+    } = result;
+    response.push({
+      customerName: customer.lastName
+        ? customer.firstName + " " + customer.lastName
+        : customer.firstName,
+      customerPhoneNumber: customer.phoneNumber,
+      paymentOption: paymentOption,
+      paymentStatus: paymentStatus,
+      totalAmount: result.productPurchase.reduce(
+        (total, item) => total + item.price,
+        0
+      ),
+      numberOfProducts: result.productPurchase.reduce(
+        (total, item) => total + item.quantity,
+        0
+      ),
+    });
+  }
+
+  return {
+    status: 200,
+    message: "Purchases fetched successfully",
+    data: {
+      pagination: {
+        totalCount,
+        totalPages: Math.ceil(totalCount / pageSize),
+        currentPage: page,
+        pageSize,
+      },
+      purchases: response,
+    },
+  };
 }

@@ -8,11 +8,13 @@ import React, { useEffect } from "react";
 
 interface InstallmentFormProps {
   totalPayment?: number;
+  isSubmitting: boolean;
   onInstallmentAdd: (data: InstallmentFormType) => void;
 }
 
 const InstallmentForm: React.FC<InstallmentFormProps> = ({
   totalPayment,
+  isSubmitting,
   onInstallmentAdd,
 }) => {
   const {
@@ -129,9 +131,10 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <button
           type="submit"
+          disabled={isSubmitting}
           className="rounded-md bg-neutral-950 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         >
-          Add Installment
+          {isSubmitting ? "Adding..." : "Add Installment"}
         </button>
       </div>
     </form>

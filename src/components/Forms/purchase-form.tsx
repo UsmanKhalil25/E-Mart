@@ -1,7 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
 import {
   ProductFormSchema,
   Customer,
@@ -11,7 +13,7 @@ import {
   FullPaymentForm as FullPaymentFormType,
   PAYMENT_OPTIONS,
   ProductWithInfo,
-  Purchase,
+  PurchaseForm as PurchaseFormType,
 } from "@/lib/type";
 import { create as createPurchase } from "@/actions/purchase/actions";
 
@@ -37,21 +39,22 @@ const PurchaseForm = () => {
     resolver: zodResolver(ProductFormSchema),
   });
 
+  const router = useRouter();
   const [customerOption, setCustomerOption] = useState<CUSTOMER_OPTIONS>(
-    CUSTOMER_OPTIONS.NEW,
+    CUSTOMER_OPTIONS.NEW
   );
 
   const [paymentOption, setPaymentOption] = useState<PAYMENT_OPTIONS>(
-    PAYMENT_OPTIONS.FULL_PAYMENT,
+    PAYMENT_OPTIONS.FULL_PAYMENT
   );
   const [selectedCustomer, setSelectedCustomer] = useState<Customer>();
   const [selectedProducts, setSelectedProducts] = useState<ProductWithInfo[]>(
-    [],
+    []
   );
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [fullPayment, setFullPayment] = useState<FullPaymentFormType>();
   const [installment, setInstallment] = useState<InstallmentFormType>();
-
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   useEffect(() => {
     let price = 0;
     selectedProducts.forEach((product) => {
@@ -73,7 +76,7 @@ const PurchaseForm = () => {
   const handleSelectProducts = (data: ProductWithInfo) => {
     setSelectedProducts((prev) => {
       const existingProduct = prev.find(
-        (item) => item.product.id === data.product.id,
+        (item) => item.product.id === data.product.id
       );
       if (existingProduct) {
         return prev.map((product) =>
@@ -83,7 +86,7 @@ const PurchaseForm = () => {
                 quantity: product.quantity + 1,
                 price: (product.quantity + 1) * product.product.price,
               }
-            : product,
+            : product
         );
       } else {
         return [
@@ -107,14 +110,14 @@ const PurchaseForm = () => {
   const handleIncreaseQuantity = (product: Product) => {
     setSelectedProducts((prev) =>
       prev.map((p) =>
-        p.product.id === product.id
+        p.product.id === product.id && p.quantity < p.product.stock
           ? {
               ...p,
               quantity: p.quantity + 1,
               price: (p.quantity + 1) * p.product.price,
             }
-          : p,
-      ),
+          : p
+      )
     );
   };
 
@@ -127,8 +130,8 @@ const PurchaseForm = () => {
               quantity: p.quantity - 1,
               price: (p.quantity - 1) * p.product.price,
             }
-          : p,
-      ),
+          : p
+      )
     );
   };
 
@@ -143,7 +146,8 @@ const PurchaseForm = () => {
 
   const addRecord = async () => {
     if (selectedCustomer && selectedProducts.length > 0) {
-      let purchaseData: Purchase | undefined;
+      setIsSubmitting(true);
+      let purchaseData: PurchaseFormType | undefined;
 
       if (paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT && fullPayment) {
         purchaseData = {
@@ -152,10 +156,7 @@ const PurchaseForm = () => {
           paymentInfo: fullPayment,
           products: selectedProducts,
         };
-      } else if (
-        paymentOption === PAYMENT_OPTIONS.INSTALLMENTS &&
-        installment
-      ) {
+      } else if (paymentOption === PAYMENT_OPTIONS.INSTALLMENT && installment) {
         purchaseData = {
           customerId: selectedCustomer.id,
           paymentOption: paymentOption,
@@ -165,8 +166,15 @@ const PurchaseForm = () => {
       }
 
       if (purchaseData) {
-        await createPurchase(purchaseData);
+        const response = await createPurchase(purchaseData);
+        if (response.status === 200) {
+          toast.success("Purchase record added.");
+          router.push("/purchase");
+        } else {
+          toast.error(response.message);
+        }
       }
+      setIsSubmitting(false);
     }
   };
 
@@ -309,9 +317,9 @@ const PurchaseForm = () => {
             </button>
             <button
               type="button"
-              onClick={() => setPaymentOption(PAYMENT_OPTIONS.INSTALLMENTS)}
+              onClick={() => setPaymentOption(PAYMENT_OPTIONS.INSTALLMENT)}
               className={`px-3 py-2 ${
-                paymentOption === PAYMENT_OPTIONS.INSTALLMENTS
+                paymentOption === PAYMENT_OPTIONS.INSTALLMENT
                   ? "rounded-md bg-neutral-950 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 "
                   : " text-sm font-semibold  text-gray-900"
               }`}
@@ -324,11 +332,13 @@ const PurchaseForm = () => {
           (paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT ? (
             <FullPaymentForm
               totalPayment={totalPrice}
+              isSubmitting={isSubmitting}
               onFullPaymentAdd={handleAddFullPayment}
             />
           ) : (
             <InstallmentForm
               totalPayment={totalPrice}
+              isSubmitting={isSubmitting}
               onInstallmentAdd={handleAddInstallment}
             />
           ))}

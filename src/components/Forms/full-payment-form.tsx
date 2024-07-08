@@ -8,11 +8,13 @@ import React, { useState, useEffect } from "react";
 
 interface FullPaymentFormProps {
   totalPayment?: number;
+  isSubmitting: boolean;
   onFullPaymentAdd: (FullPaymentFormSchema: FullPaymentFormType) => void;
 }
 
 const FullPaymentForm: React.FC<FullPaymentFormProps> = ({
   totalPayment,
+  isSubmitting,
   onFullPaymentAdd,
 }) => {
   const {
@@ -141,9 +143,10 @@ const FullPaymentForm: React.FC<FullPaymentFormProps> = ({
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <button
           type="submit"
+          disabled={isSubmitting}
           className="rounded-md bg-neutral-950 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         >
-          Add payment
+          {isSubmitting ? "Adding..." : "Add payment"}
         </button>
       </div>
     </form>
