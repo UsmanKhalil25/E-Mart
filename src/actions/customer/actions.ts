@@ -4,34 +4,51 @@ import { redirect } from "next/navigation";
 import { CustomerFormSchema, CustomerForm, Customer } from "@/lib/type";
 
 export async function create(newCustomer: CustomerForm) {
-  const result = CustomerFormSchema.safeParse(newCustomer);
-  if (!result.success) {
-    let errorMessage = "Errors creating Customer: ";
-    result.error.issues.forEach((issue) => {
-      errorMessage += issue.path[0] + ": " + issue.message + ". ";
+  try {
+    const result = CustomerFormSchema.safeParse(newCustomer);
+    if (!result.success) {
+      let errorMessage = "Errors creating Customer: ";
+      result.error.issues.forEach((issue) => {
+        errorMessage += issue.path[0] + ": " + issue.message + ". ";
+      });
+      return {
+        status: 400,
+        message: errorMessage,
+      };
+    }
+
+    const { address, ...customerData } = result.data;
+    const customer = await prisma.customer.create({
+      data: {
+        ...customerData,
+        address: address
+          ? {
+              create: {
+                district: address.district,
+                tehsil: address.tehsil,
+                city: address.city,
+                detail: address.detail,
+              },
+            }
+          : undefined,
+      },
+      include: {
+        address: true,
+      },
     });
+
     return {
-      error: errorMessage,
+      status: 201,
+      message: "Customer created successfully",
+      data: customer,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500,
+      message: "There was an error creating customer",
     };
   }
-
-  const { address, ...customerData } = result.data;
-  await prisma.customer.create({
-    data: {
-      ...customerData,
-      address: address
-        ? {
-            create: {
-              district: address.district,
-              tehsil: address.tehsil,
-              city: address.city,
-              detail: address.detail,
-            },
-          }
-        : undefined,
-    },
-  });
-  redirect("/customer");
 }
 
 export async function getAll() {

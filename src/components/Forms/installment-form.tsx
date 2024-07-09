@@ -1,10 +1,11 @@
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   InstallmentFormSchema,
   InstallmentForm as InstallmentFormType,
 } from "@/lib/type";
-import React, { useEffect } from "react";
+import { formatPrice } from "@/utils/string-utils";
 
 interface InstallmentFormProps {
   totalPayment?: number;
@@ -22,13 +23,28 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<InstallmentFormType>({
     resolver: zodResolver(InstallmentFormSchema),
     defaultValues: {
       totalPrice: totalPayment,
+      downPayment: 0,
     },
   });
 
+  const [formattedTotalPrice, setFormattedTotalPrice] = useState<string>("");
+  const [formattedDownPayment, setFormattedDownPayment] = useState<string>("");
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      const totalPrice = value.totalPrice ?? 0;
+      const downPayment = value.downPayment ?? 0;
+      setFormattedTotalPrice(formatPrice(totalPrice));
+      setFormattedDownPayment(formatPrice(downPayment));
+
+      return () => subscription.unsubscribe();
+    });
+  }, [watch]);
   useEffect(() => {
     if (totalPayment !== undefined) {
       setValue("totalPrice", totalPayment);
@@ -62,6 +78,11 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({
               {errors.totalPrice.message}
             </span>
           )}
+          {formattedTotalPrice && (
+            <div className="mt-1 text-sm text-gray-500">
+              Rupees: {formattedTotalPrice}
+            </div>
+          )}
         </div>
         <div className="sm:col-span-3">
           <label
@@ -82,6 +103,11 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({
             <span className="text-red-500 text-xs italic">
               {errors.downPayment.message}
             </span>
+          )}
+          {formattedDownPayment && (
+            <div className="mt-1 text-sm text-gray-500">
+              Rupees: {formattedDownPayment}
+            </div>
           )}
         </div>
         <div className="sm:col-span-3">

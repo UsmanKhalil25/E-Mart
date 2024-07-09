@@ -3,10 +3,19 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CustomerFormSchema, CustomerForm as Customer } from "@/lib/type";
+import toast from "react-hot-toast";
+import {
+  CustomerFormSchema,
+  CustomerForm as CustomerFormType,
+  Customer as CustomerType,
+} from "@/lib/type";
 import { create as createCustomer } from "@/actions/customer/actions";
 
-export default function CustomerForm() {
+interface CustomerFormProps {
+  onCreateCustomer: (customer: CustomerType | undefined) => void;
+}
+
+const CustomerForm: React.FC<CustomerFormProps> = ({ onCreateCustomer }) => {
   const {
     register,
     handleSubmit,
@@ -15,8 +24,15 @@ export default function CustomerForm() {
     watch,
     setError,
     clearErrors,
-  } = useForm<Customer>({
+  } = useForm<CustomerFormType>({
     resolver: zodResolver(CustomerFormSchema),
+    defaultValues: {
+      address: {
+        city: "Dinga",
+        tehsil: "Kharian",
+        district: "Gujrat",
+      },
+    },
   });
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -53,13 +69,13 @@ export default function CustomerForm() {
     }
   };
 
-  const onSubmit = async (data: Customer) => {
+  const onSubmit = async (data: CustomerFormType) => {
     setLoading(true);
     const result = CustomerFormSchema.safeParse(data);
     if (!result.success) {
       console.error(result.error);
       result.error.issues.forEach((issue) => {
-        setError(issue.path[0] as keyof Customer, {
+        setError(issue.path[0] as keyof CustomerFormType, {
           type: "manual",
           message: issue.message,
         });
@@ -67,7 +83,13 @@ export default function CustomerForm() {
       setLoading(false);
       return;
     }
-    await createCustomer(data);
+    const response = await createCustomer(result.data);
+    if (response.status === 201) {
+      toast.success(response.message);
+      onCreateCustomer(response?.data);
+    } else {
+      toast.error(response.message);
+    }
     setLoading(false);
   };
 
@@ -176,7 +198,6 @@ export default function CustomerForm() {
               <input
                 type="text"
                 id="district"
-                value={"Gujrat"}
                 {...register("address.district")}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-zinc-950 sm:text-sm sm:leading-6"
               />
@@ -198,7 +219,6 @@ export default function CustomerForm() {
               <input
                 type="text"
                 id="tehsil"
-                value={"Kharian"}
                 {...register("address.tehsil")}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-zinc-950 sm:text-sm sm:leading-6"
               />
@@ -220,7 +240,6 @@ export default function CustomerForm() {
               <input
                 type="text"
                 id="city"
-                value={"Dinga"}
                 {...register("address.city")}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-zinc-950 sm:text-sm sm:leading-6"
               />
@@ -272,4 +291,6 @@ export default function CustomerForm() {
       </div>
     </form>
   );
-}
+};
+
+export default CustomerForm;

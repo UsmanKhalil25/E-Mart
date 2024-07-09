@@ -23,6 +23,7 @@ export default function ProductForm() {
     watch,
   } = useForm<ProductFormType>({
     resolver: zodResolver(ProductFormSchema),
+    defaultValues: {},
   });
 
   const router = useRouter();

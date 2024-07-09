@@ -1,20 +1,44 @@
 import { z } from "zod";
-import { PaymentStatus, PaymentOption } from "@prisma/client";
 
-export const TaskSchema = z.object({
-  id: z.number().optional(),
-  title: z
+/*
+ * Category schema
+ */
+export const CategoryFormSchema = z.object({
+  name: z
     .string()
     .trim()
-    .min(1, {
-      message: "Task must be at least 1 character",
-    })
-    .max(100, {
-      message: "Task cannot be longer then 1 character",
+    .min(1, { message: "Category name must be 1 character long." })
+    .max(255, {
+      message: "Category name cannot be longer then 255 characters",
     }),
 });
-export type Task = z.infer<typeof TaskSchema>;
+export type CategoryForm = z.infer<typeof CategoryFormSchema>;
 
+export type Category = {
+  id: number;
+  name: string;
+};
+
+/*
+ * Company schema
+ */
+export const CompanyFormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: "Company name must be 1 character long." })
+    .max(255, { message: "Company name cannot be longer then 255 characters" }),
+});
+export type CompanyForm = z.infer<typeof CompanyFormSchema>;
+
+export type Company = {
+  id: number;
+  name: string;
+};
+
+/*
+ * Product schema
+ */
 export const ProductFormSchema = z.object({
   company: z.string({
     required_error: "Company is required",
@@ -54,35 +78,10 @@ export type ProductWithInfo = {
   price: number;
   quantity: number;
 };
-export const CompanyFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, { message: "Company name must be 1 character long." })
-    .max(255, { message: "Company name cannot be longer then 255 characters" }),
-});
-export type CompanyForm = z.infer<typeof CompanyFormSchema>;
 
-export type Company = {
-  id: number;
-  name: string;
-};
-
-export const CategoryFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, { message: "Category name must be 1 character long." })
-    .max(255, {
-      message: "Category name cannot be longer then 255 characters",
-    }),
-});
-export type CategoryForm = z.infer<typeof CategoryFormSchema>;
-
-export type Category = {
-  id: number;
-  name: string;
-};
+/*
+ * Address schema
+ */
 export const AddressFormSchema = z.object({
   district: z
     .string()
@@ -120,6 +119,9 @@ export type Address = {
   detail: string;
 };
 
+/*
+ * Customer schema
+ */
 export const CustomerFormSchema = z.object({
   id: z.number().int().optional(),
   firstName: z
@@ -153,6 +155,10 @@ export type Customer = {
   address: Address | null;
 };
 
+/*
+ * FullPayment schema
+ */
+
 export const FullPaymentFormSchema = z.object({
   payment: z
     .number({
@@ -170,7 +176,29 @@ export const FullPaymentFormSchema = z.object({
 });
 export type FullPaymentForm = z.infer<typeof FullPaymentFormSchema>;
 
-export const InstallmentFormSchema = z.object({
+export type FullPayment = {
+  id: number;
+  purchaseId: number;
+  discount: number | null;
+  purchaseAmount: number;
+};
+
+/*
+ * Installment schema
+ */
+
+export type Installment = {
+  id: number;
+  payment: number | null;
+  dueDate: Date;
+  paidAt: Date | null;
+};
+
+/*
+ * InstallmentPlan schema
+ */
+
+export const InstallmentPlanFormSchema = z.object({
   totalPrice: z
     .number({
       required_error: "Please enter total amount",
@@ -201,7 +229,18 @@ export const InstallmentFormSchema = z.object({
   paidAt: z.date().optional(),
 });
 
-export type InstallmentForm = z.infer<typeof InstallmentFormSchema>;
+export type InstallmentPlanForm = z.infer<typeof InstallmentPlanFormSchema>;
+export type InstallmentPlan = {
+  id: number;
+  totalPrice: number;
+  remainingPrice: number;
+  downPayment: number;
+  installmentPeriod: number;
+  installments: Installment[];
+};
+/*
+ * enums schema
+ */
 
 export const PAYMENT_OPTIONS: {
   FULL_PAYMENT: "FULL_PAYMENT";
@@ -227,50 +266,38 @@ export const PAYMENT_STATUS: {
 export type PAYMENT_STATUS =
   (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS];
 
-export type PurchaseForm = {
-  customerId: number;
-  paymentOption: PaymentOption;
-  paymentInfo: FullPaymentForm | InstallmentForm;
-  products: ProductWithInfo[];
-};
-
-export type Purchase = {
-  id: number;
-  customerId: number;
-  customer: Customer;
-  paymentStatus: PaymentStatus;
-  paymentOption: PaymentOption;
-  productPurchase: ProductPurchase[];
-  fullPayment: FullPayment | null;
-  installments: Installment[];
-  createdAt: Date;
-  updatedAt: Date;
-};
-
+/*
+ * ProductPurchase schema
+ */
 export type ProductPurchase = {
   id: number;
   productId: number;
+  product: Product;
   purchaseId: number;
   quantity: number;
   price: number;
 };
 
-export type FullPayment = {
-  id: number;
-  purchaseId: number;
-  discount: number | null;
-  purchaseAmount: number;
-};
+/*
+ * Purchase schema
+ */
 
-export type Installment = {
+export type Purchase = {
   id: number;
-  purchaseId: number;
-  totalPrice: number;
-  downPayment: number;
-  remainingPrice: number;
-  dueDate: Date;
-  paidAt: Date | null;
-  installmentPeriod: number;
+  customerId: number;
+  customer: Customer;
+  paymentStatus: PAYMENT_STATUS;
+  paymentOption: PAYMENT_OPTIONS;
+  productPurchase: ProductPurchase[];
+  fullPayment: FullPayment | null;
+  installmentPlan: InstallmentPlan;
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type PurchaseForm = {
+  customerId: number;
+  paymentOption: PAYMENT_OPTIONS;
+  paymentInfo: FullPaymentForm | InstallmentPlanForm;
+  products: ProductWithInfo[];
 };

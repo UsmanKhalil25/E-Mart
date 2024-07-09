@@ -69,6 +69,10 @@ const PurchaseForm = () => {
       : address.detail;
   };
 
+  const handleCreateCustomer = (data: Customer | undefined) => {
+    setSelectedCustomer(data);
+  };
+
   const handleSelectCustomer = (data: Customer) => {
     setSelectedCustomer(data);
   };
@@ -218,7 +222,7 @@ const PurchaseForm = () => {
             <CustomerSearchBar onCustomerSelected={handleSelectCustomer} />
           </div>
         ) : (
-          <CustomerForm />
+          <CustomerForm onCreateCustomer={handleCreateCustomer} />
         )}
         {selectedCustomer && (
           <div className="mt-4 max-w-xl mr-auto">

@@ -71,22 +71,23 @@ enum PaymentStatus {
   FAILED
   REFUNDED
 }
+
 enum PaymentOption{
   FULL_PAYMENT
   INSTALLMENT
 }
 
 model Purchase{
-  id              Int       @id @default(autoincrement())
-  customer        Customer  @relation(fields: [customerId], references: [id])
-  customerId      Int
-  paymentStatus   PaymentStatus
-  paymentOption   PaymentOption
-  productPurchase ProductPurchase[]
-  fullPayment     FullPayment?
-  installments    Installment[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                    Int       @id @default(autoincrement())
+  customer              Customer  @relation(fields: [customerId], references: [id])
+  customerId            Int
+  paymentStatus         PaymentStatus
+  paymentOption         PaymentOption
+  productPurchase       ProductPurchase[]
+  fullPayment           FullPayment?
+  installmentPlan       InstallmentPlan?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }
 
 
@@ -108,16 +109,26 @@ model FullPayment {
   purchaseAmount  Int
 }
 
-model Installment {
+model InstallmentPlan {
   id                  Int       @id @default(autoincrement())
   purchase            Purchase  @relation(fields: [purchaseId], references: [id])
-  purchaseId          Int       
+  purchaseId          Int       @unique
   totalPrice          Int
-  downPayment         Int
   remainingPrice      Int
+  downPayment         Int 
+  installmentPeriod   Int
+  installments        Installment[]
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model Installment {
+  id                  Int               @id @default(autoincrement())
+  installmentPlan     InstallmentPlan   @relation(fields: [installmentPlanId], references: [id])
+  installmentPlanId   Int
+  payment             Int?
   dueDate             DateTime
   paidAt              DateTime?
-  installmentPeriod   Int
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 }

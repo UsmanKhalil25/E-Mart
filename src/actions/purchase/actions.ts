@@ -138,3 +138,44 @@ export async function getAll(page = 1, pageSize = 10) {
     },
   };
 }
+
+export async function getOne(purchaseId: number) {
+  try {
+    const result = await prisma.purchase.findUnique({
+      where: {
+        id: purchaseId,
+      },
+      include: {
+        customer: {
+          include: {
+            address: true,
+          },
+        },
+        fullPayment: true,
+        installments: true,
+        productPurchase: {
+          include: {
+            product: {
+              include: {
+                company: true,
+                category: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return {
+      status: 200,
+      message: "Purchase record fetched successfully",
+      data: result,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500,
+      message: "Error fetching purchase record",
+      data: null,
+    };
+  }
+}

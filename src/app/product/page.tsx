@@ -4,15 +4,8 @@ import TableHeader from "@/components/Tables/table-header";
 import TableBody from "@/components/Tables/table-body";
 import { getAll as getAllProducts } from "@/actions/product/actions";
 import Link from "next/link";
+import { TABLE_HEADER_PRODUCT as TABLE_HEADER } from "@/constants/index";
 
-const TABLE_HEADER = [
-  { key: "company", label: "Company" },
-  { key: "category", label: "Category" },
-  { key: "model", label: "Model" },
-  { key: "price", label: "Price" },
-  { key: "stock", label: "Stock" },
-  { key: "Purchases", label: "Purchases" },
-];
 interface Product {
   id: number;
   model: string;

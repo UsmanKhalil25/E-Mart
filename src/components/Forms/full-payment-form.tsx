@@ -1,10 +1,11 @@
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   FullPaymentFormSchema,
   FullPaymentForm as FullPaymentFormType,
 } from "@/lib/type";
-import React, { useState, useEffect } from "react";
+import { formatPrice } from "@/utils/string-utils";
 
 interface FullPaymentFormProps {
   totalPayment?: number;
@@ -34,10 +35,6 @@ const FullPaymentForm: React.FC<FullPaymentFormProps> = ({
   const [formattedPayment, setFormattedPayment] = useState<string>("");
   const [formattedDiscount, setFormattedDiscount] = useState<string>("");
   const [totalAfterDiscount, setTotalAfterDiscount] = useState<string>("");
-
-  const formatPrice = (price: number) => {
-    return price.toLocaleString();
-  };
 
   useEffect(() => {
     const subscription = watch((value) => {

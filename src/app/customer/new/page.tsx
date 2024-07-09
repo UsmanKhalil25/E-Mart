@@ -1,5 +1,11 @@
+"use client";
 import CustomerForm from "@/components/Forms/customer-form";
+import { Customer as CustomerType } from "@/lib/type";
 const CustomerNew = () => {
+  const handleCreateCustomer = (data: CustomerType | undefined) => {
+    // don't need to do anything here for now
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-10 py-10">
       <fieldset className="space-y-12">
@@ -10,7 +16,7 @@ const CustomerNew = () => {
           Let's add a new customer.
         </p>
       </fieldset>
-      <CustomerForm />
+      <CustomerForm onCreateCustomer={handleCreateCustomer} />
     </div>
   );
 };
