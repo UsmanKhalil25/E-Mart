@@ -10,7 +10,7 @@ const mainRoutes = [
   { name: "Dashboard", path: "/dashboard", requiresAuth: true },
   { name: "Products", path: "/product", requiresAuth: true },
   { name: "Customers", path: "/customer", requiresAuth: true },
-  { name: "Purchases", path: "/purchase", requiresAuth: true },
+  { name: "Sales", path: "/sale", requiresAuth: true },
 ];
 export default function Sidebar() {
   const pathname = usePathname();

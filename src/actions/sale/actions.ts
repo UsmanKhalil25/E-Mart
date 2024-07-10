@@ -3,16 +3,16 @@ import prisma from "@/lib/db";
 import {
   PAYMENT_OPTIONS,
   PAYMENT_STATUS,
-  PurchaseForm,
+  SaleForm,
   FullPaymentForm,
-  InstallmentForm,
+  InstallmentPlanForm,
 } from "@/lib/type";
 
-export async function create(newPurchase: PurchaseForm) {
-  if (!newPurchase) {
+export async function create(newSale: SaleForm) {
+  if (!newSale) {
     return { status: 400, message: "Required data is missing" };
   }
-  for (const item of newPurchase.products) {
+  for (const item of newSale.products) {
     if (item.product.stock < item.quantity) {
       return { status: 400, message: "Not enough stock present" };
     }
@@ -20,43 +20,49 @@ export async function create(newPurchase: PurchaseForm) {
 
   try {
     const paymentStatus =
-      newPurchase.paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT
+      newSale.paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT
         ? PAYMENT_STATUS.COMPLETED
         : PAYMENT_STATUS.PENDING;
 
-    const purchase = await prisma.purchase.create({
+    const sale = await prisma.sale.create({
       data: {
-        customerId: newPurchase.customerId,
+        customerId: newSale.customerId,
         paymentStatus: paymentStatus,
-        paymentOption: newPurchase.paymentOption,
+        paymentOption: newSale.paymentOption,
       },
     });
 
-    if (newPurchase.paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT) {
-      const paymentInfo = newPurchase.paymentInfo as FullPaymentForm;
+    if (newSale.paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT) {
+      const paymentInfo = newSale.paymentInfo as FullPaymentForm;
       await prisma.fullPayment.create({
         data: {
-          purchaseId: purchase.id,
-          purchaseAmount: paymentInfo.payment,
+          saleId: sale.id,
+          purchaseAmount: paymentInfo.purchaseAmount,
           discount: paymentInfo.discount ?? 0,
         },
       });
-    } else if (newPurchase.paymentOption === PAYMENT_OPTIONS.INSTALLMENT) {
-      const paymentInfo = newPurchase.paymentInfo as InstallmentForm;
-      await prisma.installment.create({
+    } else if (newSale.paymentOption === PAYMENT_OPTIONS.INSTALLMENT) {
+      const paymentInfo = newSale.paymentInfo as InstallmentPlanForm;
+      const installmentPlan = await prisma.installmentPlan.create({
         data: {
-          purchaseId: purchase.id,
+          saleId: sale.id,
           totalPrice: paymentInfo.totalPrice,
           downPayment: paymentInfo.downPayment,
           installmentPeriod: paymentInfo.installmentPeriod,
-          dueDate: new Date(paymentInfo.dueDate),
-          paidAt: paymentInfo.paidAt || null,
           remainingPrice: paymentInfo.totalPrice - paymentInfo.downPayment,
+        },
+      });
+      const dueDate = new Date(paymentInfo.dueDate).toISOString();
+      await prisma.installment.create({
+        data: {
+          installmentPlanId: installmentPlan.id,
+          dueDate: dueDate,
+          expectedPayment: paymentInfo.expectedPayment,
         },
       });
     }
 
-    for (const item of newPurchase.products) {
+    for (const item of newSale.products) {
       await prisma.product.update({
         where: {
           id: item.product.id,
@@ -65,16 +71,24 @@ export async function create(newPurchase: PurchaseForm) {
           stock: item.product.stock - item.quantity,
         },
       });
-      await prisma.productPurchase.create({
+      await prisma.productSale.create({
         data: {
           productId: item.product.id,
-          purchaseId: purchase.id,
+          saleId: sale.id,
           quantity: item.quantity,
           price: item.price,
         },
       });
     }
-    return { status: 200, message: "Purchase created successfully" };
+    await prisma.bookRecord.create({
+      data: {
+        saleId: sale.id,
+        bookName: newSale.bookRecord.bookName,
+        pageNumber: newSale.bookRecord.pageNumber,
+        description: newSale.bookRecord.description,
+      },
+    });
+    return { status: 200, message: "Sale created successfully" };
   } catch (error) {
     console.error(error);
     return { status: 500, message: "Something went wrong" };
@@ -84,15 +98,14 @@ export async function create(newPurchase: PurchaseForm) {
 export async function getAll(page = 1, pageSize = 10) {
   const skip = (page - 1) * pageSize;
 
-  const results = await prisma.purchase.findMany({
+  const results = await prisma.sale.findMany({
     skip: skip,
     take: pageSize,
     include: {
       customer: {
         select: { firstName: true, lastName: true, phoneNumber: true },
       },
-
-      productPurchase: true,
+      productSales: true,
     },
   });
 
@@ -101,23 +114,24 @@ export async function getAll(page = 1, pageSize = 10) {
   for (const result of results) {
     const {
       customer,
-      productPurchase,
+      productSales,
       paymentOption,
       paymentStatus,
-      ...purchaseData
+      ...saleData
     } = result;
     response.push({
+      id: saleData.id,
       customerName: customer.lastName
         ? customer.firstName + " " + customer.lastName
         : customer.firstName,
       customerPhoneNumber: customer.phoneNumber,
       paymentOption: paymentOption,
       paymentStatus: paymentStatus,
-      totalAmount: result.productPurchase.reduce(
+      totalAmount: result.productSales.reduce(
         (total, item) => total + item.price,
         0
       ),
-      numberOfProducts: result.productPurchase.reduce(
+      numberOfProducts: result.productSales.reduce(
         (total, item) => total + item.quantity,
         0
       ),
@@ -126,7 +140,7 @@ export async function getAll(page = 1, pageSize = 10) {
 
   return {
     status: 200,
-    message: "Purchases fetched successfully",
+    message: "Sales fetched successfully",
     data: {
       pagination: {
         totalCount,
@@ -134,16 +148,16 @@ export async function getAll(page = 1, pageSize = 10) {
         currentPage: page,
         pageSize,
       },
-      purchases: response,
+      sales: response,
     },
   };
 }
 
-export async function getOne(purchaseId: number) {
+export async function getOne(SaleId: number) {
   try {
-    const result = await prisma.purchase.findUnique({
+    const result = await prisma.sale.findUnique({
       where: {
-        id: purchaseId,
+        id: SaleId,
       },
       include: {
         customer: {
@@ -152,8 +166,12 @@ export async function getOne(purchaseId: number) {
           },
         },
         fullPayment: true,
-        installments: true,
-        productPurchase: {
+        installmentPlan: {
+          include: {
+            installments: true,
+          },
+        },
+        productSales: {
           include: {
             product: {
               include: {
@@ -163,18 +181,19 @@ export async function getOne(purchaseId: number) {
             },
           },
         },
+        bookRecord: true,
       },
     });
     return {
       status: 200,
-      message: "Purchase record fetched successfully",
+      message: "Sale record fetched successfully",
       data: result,
     };
   } catch (error) {
     console.error(error);
     return {
       status: 500,
-      message: "Error fetching purchase record",
+      message: "Error fetching Sale record",
       data: null,
     };
   }

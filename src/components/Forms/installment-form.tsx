@@ -2,20 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  InstallmentFormSchema,
-  InstallmentForm as InstallmentFormType,
+  InstallmentPlanFormSchema,
+  InstallmentPlanForm as InstallmentPlanFormType,
 } from "@/lib/type";
 import { formatPrice } from "@/utils/string-utils";
 
 interface InstallmentFormProps {
   totalPayment?: number;
-  isSubmitting: boolean;
-  onInstallmentAdd: (data: InstallmentFormType) => void;
+  onInstallmentAdd: (data: InstallmentPlanFormType) => void;
 }
 
 const InstallmentForm: React.FC<InstallmentFormProps> = ({
   totalPayment,
-  isSubmitting,
   onInstallmentAdd,
 }) => {
   const {
@@ -24,23 +22,28 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({
     formState: { errors },
     setValue,
     watch,
-  } = useForm<InstallmentFormType>({
-    resolver: zodResolver(InstallmentFormSchema),
+  } = useForm<InstallmentPlanFormType>({
+    resolver: zodResolver(InstallmentPlanFormSchema),
     defaultValues: {
       totalPrice: totalPayment,
       downPayment: 0,
+      expectedPayment: 10000,
     },
   });
 
   const [formattedTotalPrice, setFormattedTotalPrice] = useState<string>("");
   const [formattedDownPayment, setFormattedDownPayment] = useState<string>("");
-
+  const [formattedExpectedPayment, setFormattedExpectedPayment] =
+    useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   useEffect(() => {
     const subscription = watch((value) => {
       const totalPrice = value.totalPrice ?? 0;
       const downPayment = value.downPayment ?? 0;
+      const expectedPayment = value.expectedPayment ?? 0;
       setFormattedTotalPrice(formatPrice(totalPrice));
       setFormattedDownPayment(formatPrice(downPayment));
+      setFormattedExpectedPayment(formatPrice(expectedPayment));
 
       return () => subscription.unsubscribe();
     });
@@ -51,7 +54,8 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({
     }
   }, [totalPayment, setValue]);
 
-  const onSubmit = (data: InstallmentFormType) => {
+  const onSubmit = (data: InstallmentPlanFormType) => {
+    setIsSubmitting(true);
     onInstallmentAdd(data);
   };
 
@@ -133,6 +137,32 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({
         </div>
         <div className="sm:col-span-3">
           <label
+            htmlFor="expectedPayment"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Expected payment for next installment
+          </label>
+          <div className="mt-2">
+            <input
+              type="number"
+              id="expectedPayment"
+              {...register("expectedPayment", { valueAsNumber: true })}
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-zinc-950 sm:text-sm sm:leading-6"
+            />
+          </div>
+          {errors.expectedPayment && (
+            <span className="text-red-500 text-xs italic">
+              {errors.expectedPayment.message}
+            </span>
+          )}
+          {formattedExpectedPayment && (
+            <div className="mt-1 text-sm text-gray-500">
+              Rupees: {formattedExpectedPayment}
+            </div>
+          )}
+        </div>
+        <div className="sm:col-span-3">
+          <label
             htmlFor="installmentPeriod"
             className="block text-sm font-medium leading-6 text-gray-900"
           >
@@ -154,15 +184,16 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({
           )}
         </div>
       </div>
-      <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="rounded-md bg-neutral-950 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-        >
-          {isSubmitting ? "Adding..." : "Add Installment"}
-        </button>
-      </div>
+      {!isSubmitting && (
+        <div className="mt-6 flex items-center justify-end gap-x-6">
+          <button
+            type="submit"
+            className="rounded-md bg-neutral-950 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            Add Installment
+          </button>
+        </div>
+      )}
     </form>
   );
 };

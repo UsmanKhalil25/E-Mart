@@ -1,6 +1,5 @@
 "use server";
 import prisma from "@/lib/db";
-import { redirect } from "next/navigation";
 import { CustomerFormSchema, CustomerForm, Customer } from "@/lib/type";
 
 export async function create(newCustomer: CustomerForm) {
@@ -51,25 +50,28 @@ export async function create(newCustomer: CustomerForm) {
   }
 }
 
-export async function getAll() {
+export async function getAll(page = 1, pageSize = 10) {
+  const skip = (page - 1) * pageSize;
+
   const results = await prisma.customer.findMany({
+    skip: skip,
+    take: pageSize,
     include: {
       address: true,
     },
   });
-  let response = [];
-  for (const result of results) {
-    const { address, ...customerData } = result;
-    response.push({
-      district: address?.district,
-      tehsil: address?.tehsil,
-      city: address?.city,
-      detail: address?.detail,
-      name: result.firstName + " " + result?.lastName,
-      ...customerData,
-    });
-  }
-  return response;
+
+  const totalCount = await prisma.customer.count();
+
+  return {
+    pagination: {
+      totalCount,
+      totalPages: Math.ceil(totalCount / pageSize),
+      currentPage: page,
+      pageSize,
+    },
+    customers: results,
+  };
 }
 
 interface SearchParams {

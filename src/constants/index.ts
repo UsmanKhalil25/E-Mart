@@ -8,8 +8,17 @@ export const TABLE_HEADER_PRODUCT = [
   { key: "Purchases", label: "Purchases" },
 ];
 
-// page: /purchase/[id]
-export const TABLE_HEADER_PURCHASE_PRODUCT = [
+// getAll Customers
+export const TABLE_HEADER_CUSTOMER = [
+  { key: "name", label: "Name" },
+  { key: "phoneNumber", label: "Phone Number" },
+  { key: "CNIC", label: "CNIC" },
+  { key: "city", label: "City" },
+  { key: "detail", label: "Address details" },
+];
+
+// page: /sale/[id]
+export const TABLE_HEADER_SALE_PRODUCT = [
   { key: "company", label: "Company" },
   { key: "category", label: "Category" },
   { key: "model", label: "Model" },
@@ -17,4 +26,10 @@ export const TABLE_HEADER_PURCHASE_PRODUCT = [
   { key: "quantity", label: "Quantity" },
 ];
 
-export const TABLE_HEADER_PURCHASE_INSTALLMENTS = [];
+export const TABLE_HEADER_INSTALLMENTS = [
+  { key: "id", label: "Installment No" },
+  { key: "expectedPayment", label: "Expected Payment" },
+  { key: "actualPayment", label: "Actual Payment" },
+  { key: "dueDate", label: "Due Date" },
+  { key: "paidAt", label: "Paid At" },
+];

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import TableHeader from "@/components/Tables/table-header";
 import TableBody from "@/components/Tables/table-body";
-import { getAll as getAllPurchases } from "@/actions/purchase/actions";
+import { getAll as getAllSales } from "@/actions/sale/actions";
 import { PAYMENT_OPTIONS, PAYMENT_STATUS } from "@/lib/type";
 import Link from "next/link";
 
@@ -15,7 +15,8 @@ const TABLE_HEADER = [
   { key: "totalAmount", label: "Total Amount" },
   { key: "numberOfProducts", label: "Number of Product" },
 ];
-interface PurchaseAllType {
+interface SaleAllType {
+  id: number;
   customerName: string;
   customerPhoneNumber: string;
   paymentOption: PAYMENT_OPTIONS;
@@ -24,23 +25,23 @@ interface PurchaseAllType {
   numberOfProducts: number;
 }
 
-interface PurchaseResponse {
+interface SaleResponse {
   pagination: {
     totalCount: number;
     totalPages: number;
     currentPage: number;
     pageSize: number;
   };
-  purchases: PurchaseAllType[];
+  sales: SaleAllType[];
 }
 
-export default function Purchase() {
+export default function SalePage() {
   const [page, setPage] = useState<number>(1);
-  const [data, setData] = useState<PurchaseResponse | null>(null);
+  const [data, setData] = useState<SaleResponse | null>(null);
   const pageSize = 10;
 
   const fetchData = async (page: number) => {
-    const response = await getAllPurchases(page, pageSize);
+    const response = await getAllSales(page, pageSize);
     if (response.status === 200) {
       setData(response.data);
     } else {
@@ -71,13 +72,13 @@ export default function Purchase() {
     <div>
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold leading-7 text-zinc-900">
-          All purchases
+          All Sales
         </h3>
         <Link
-          href={"/purchase/new"}
+          href={"/sale/new"}
           className="rounded-md bg-zinc-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-zinc-700"
         >
-          Add New Purchase
+          Add New Sale
         </Link>
       </div>
 
@@ -85,7 +86,11 @@ export default function Purchase() {
       <div className="overflow-x-auto rounded-md">
         <table className="table-auto w-full text-left whitespace-no-wrap">
           <TableHeader columns={TABLE_HEADER} />
-          <TableBody columns={TABLE_HEADER} data={data.purchases} />
+          <TableBody
+            columns={TABLE_HEADER}
+            data={data.sales}
+            redirectionUrl={"/sale"}
+          />
         </table>
       </div>
 

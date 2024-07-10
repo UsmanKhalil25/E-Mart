@@ -1,27 +1,26 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import {
-  ProductFormSchema,
   Customer,
   Address,
   Product,
-  InstallmentForm as InstallmentFormType,
+  InstallmentPlanForm as InstallmentPlanFormType,
   FullPaymentForm as FullPaymentFormType,
+  BookRecordForm as BookRecordFormType,
   PAYMENT_OPTIONS,
   ProductWithInfo,
-  PurchaseForm as PurchaseFormType,
+  SaleForm as SaleFormType,
 } from "@/lib/type";
-import { create as createPurchase } from "@/actions/purchase/actions";
+import { create as createSale } from "@/actions/sale/actions";
 
 import CustomerForm from "@/components/Forms/customer-form";
 import CustomerSearchBar from "@/components/Searchbars/customer-search-bar";
 import ProductSearchBar from "@/components/Searchbars/product-search-bar";
 import InstallmentForm from "@/components/Forms/installment-form";
 import FullPaymentForm from "@/components/Forms/full-payment-form";
+import BookRecordForm from "@/components/Forms/bookrecord-form";
 import TrashIcon from "@/components/Icons/TrashIcon";
 import PlusIcon from "@/components/Icons/PlusIcon";
 import MinusIcon from "@/components/Icons/MinusIcon";
@@ -31,14 +30,7 @@ enum CUSTOMER_OPTIONS {
   OLD,
 }
 
-const PurchaseForm = () => {
-  const {
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Product>({
-    resolver: zodResolver(ProductFormSchema),
-  });
-
+const SaleForm = () => {
   const router = useRouter();
   const [customerOption, setCustomerOption] = useState<CUSTOMER_OPTIONS>(
     CUSTOMER_OPTIONS.NEW
@@ -52,9 +44,12 @@ const PurchaseForm = () => {
     []
   );
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [bookRecord, setBookRecord] = useState<BookRecordFormType>();
   const [fullPayment, setFullPayment] = useState<FullPaymentFormType>();
-  const [installment, setInstallment] = useState<InstallmentFormType>();
+  const [installmentPlan, setInstallmentPlan] =
+    useState<InstallmentPlanFormType>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   useEffect(() => {
     let price = 0;
     selectedProducts.forEach((product) => {
@@ -139,41 +134,55 @@ const PurchaseForm = () => {
     );
   };
 
-  const handleAddFullPayment = async (data: FullPaymentFormType) => {
+  const handleAddBookRecord = (data: BookRecordFormType) => {
+    setBookRecord(data);
+  };
+
+  const handleAddFullPayment = (data: FullPaymentFormType) => {
     setFullPayment(data);
-    await addRecord();
   };
-  const handleAddInstallment = async (data: InstallmentFormType) => {
-    setInstallment(data);
-    await addRecord();
+
+  const handleAddInstallment = (data: InstallmentPlanFormType) => {
+    setInstallmentPlan(data);
   };
+
+  useEffect(() => {
+    if (bookRecord) {
+      addRecord();
+    }
+  }, [bookRecord]);
 
   const addRecord = async () => {
-    if (selectedCustomer && selectedProducts.length > 0) {
+    if (selectedCustomer && bookRecord && selectedProducts.length > 0) {
       setIsSubmitting(true);
-      let purchaseData: PurchaseFormType | undefined;
+      let saleData: SaleFormType | undefined;
 
       if (paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT && fullPayment) {
-        purchaseData = {
+        saleData = {
           customerId: selectedCustomer.id,
           paymentOption: paymentOption,
           paymentInfo: fullPayment,
           products: selectedProducts,
+          bookRecord,
         };
-      } else if (paymentOption === PAYMENT_OPTIONS.INSTALLMENT && installment) {
-        purchaseData = {
+      } else if (
+        paymentOption === PAYMENT_OPTIONS.INSTALLMENT &&
+        installmentPlan
+      ) {
+        saleData = {
           customerId: selectedCustomer.id,
           paymentOption: paymentOption,
-          paymentInfo: installment,
+          paymentInfo: installmentPlan,
           products: selectedProducts,
+          bookRecord,
         };
       }
 
-      if (purchaseData) {
-        const response = await createPurchase(purchaseData);
+      if (saleData) {
+        const response = await createSale(saleData);
         if (response.status === 200) {
-          toast.success("Purchase record added.");
-          router.push("/purchase");
+          toast.success("Sale record added.");
+          router.push("/sale");
         } else {
           toast.error(response.message);
         }
@@ -186,10 +195,10 @@ const PurchaseForm = () => {
     <div className="w-full max-w-4xl mx-auto px-10 py-10">
       <fieldset className="space-y-12">
         <legend className="text-lg font-semibold leading-7 text-gray-900 border-b border-gray-900/10 pb-4">
-          Purchase Information
+          Sale Information
         </legend>
         <p className="mt-1 text-sm leading-6 text-gray-600">
-          Add a new purchase record here.
+          Add a new Sale record here.
         </p>
 
         <div className="flex space-x-4">
@@ -306,6 +315,7 @@ const PurchaseForm = () => {
             ))}
           </div>
         )}
+
         {selectedProducts.length > 0 && (
           <div className="flex space-x-4">
             <button
@@ -336,19 +346,33 @@ const PurchaseForm = () => {
           (paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT ? (
             <FullPaymentForm
               totalPayment={totalPrice}
-              isSubmitting={isSubmitting}
               onFullPaymentAdd={handleAddFullPayment}
             />
           ) : (
             <InstallmentForm
               totalPayment={totalPrice}
-              isSubmitting={isSubmitting}
               onInstallmentAdd={handleAddInstallment}
             />
           ))}
+
+        {installmentPlan || fullPayment ? (
+          <>
+            <div
+              className={
+                "px-3 py-2 w-28 rounded-md bg-neutral-950 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 "
+              }
+            >
+              Book Record
+            </div>
+            <BookRecordForm
+              isSubmitting={isSubmitting}
+              onAddBookRecord={handleAddBookRecord}
+            />
+          </>
+        ) : null}
       </fieldset>
     </div>
   );
 };
 
-export default PurchaseForm;
+export default SaleForm;

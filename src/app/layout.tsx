@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-const inter = Inter({ subsets: ["latin"] });
+
+import { Reddit_Mono } from "next/font/google";
+
+const roboto = Reddit_Mono({
+  weight: ["200", "400", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
 
 import { Toaster } from "react-hot-toast";
 import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "E-Mart",
+  description: "All your electronics under one roof.",
 };
 
 export default function RootLayout({
@@ -16,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={roboto.className}>
       <body>
         <Toaster position="top-center" reverseOrder={false} />
         <div className="flex h-screen">

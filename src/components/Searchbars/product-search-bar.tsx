@@ -158,7 +158,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
       </div>
       {products && products.length > 0 && (
         <div className="mt-4">
-          <h2 className="text-sm font-semibold mb-2">Customers Found:</h2>
+          <h2 className="text-sm font-semibold mb-2">Products Found:</h2>
           <ul className="space-y-2 max-h-36 overflow-y-auto">
             {products.map((product) => (
               <li

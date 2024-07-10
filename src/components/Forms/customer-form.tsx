@@ -21,7 +21,6 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onCreateCustomer }) => {
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
     setError,
     clearErrors,
   } = useForm<CustomerFormType>({

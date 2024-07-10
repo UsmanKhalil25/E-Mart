@@ -9,13 +9,11 @@ import { formatPrice } from "@/utils/string-utils";
 
 interface FullPaymentFormProps {
   totalPayment?: number;
-  isSubmitting: boolean;
   onFullPaymentAdd: (FullPaymentFormSchema: FullPaymentFormType) => void;
 }
 
 const FullPaymentForm: React.FC<FullPaymentFormProps> = ({
   totalPayment,
-  isSubmitting,
   onFullPaymentAdd,
 }) => {
   const {
@@ -28,17 +26,18 @@ const FullPaymentForm: React.FC<FullPaymentFormProps> = ({
     resolver: zodResolver(FullPaymentFormSchema),
     defaultValues: {
       discount: 0,
-      payment: totalPayment,
+      purchaseAmount: totalPayment,
     },
   });
 
   const [formattedPayment, setFormattedPayment] = useState<string>("");
   const [formattedDiscount, setFormattedDiscount] = useState<string>("");
   const [totalAfterDiscount, setTotalAfterDiscount] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     const subscription = watch((value) => {
-      const payment = value.payment ?? 0;
+      const payment = value.purchaseAmount ?? 0;
       const discount = value.discount ?? 0;
       if (payment > discount) {
         const total = payment - discount;
@@ -54,11 +53,12 @@ const FullPaymentForm: React.FC<FullPaymentFormProps> = ({
 
   useEffect(() => {
     if (totalPayment !== undefined) {
-      setValue("payment", totalPayment);
+      setValue("purchaseAmount", totalPayment);
     }
   }, [totalPayment, setValue]);
 
   const onSubmit = (data: FullPaymentFormType) => {
+    setIsSubmitting(true);
     onFullPaymentAdd(data);
   };
 
@@ -76,13 +76,13 @@ const FullPaymentForm: React.FC<FullPaymentFormProps> = ({
             <input
               type="number"
               id="payment"
-              {...register("payment", { valueAsNumber: true })}
+              {...register("purchaseAmount", { valueAsNumber: true })}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-zinc-950 sm:text-sm sm:leading-6"
             />
           </div>
-          {errors.payment && (
+          {errors.purchaseAmount && (
             <span className="text-red-500 text-xs italic ">
-              {errors.payment.message}
+              {errors.purchaseAmount.message}
             </span>
           )}
           {formattedPayment && (
@@ -137,15 +137,16 @@ const FullPaymentForm: React.FC<FullPaymentFormProps> = ({
           />
         </div>
       </div>
-      <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="rounded-md bg-neutral-950 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-        >
-          {isSubmitting ? "Adding..." : "Add payment"}
-        </button>
-      </div>
+      {!isSubmitting && (
+        <div className="mt-6 flex items-center justify-end gap-x-6">
+          <button
+            type="submit"
+            className="rounded-md bg-neutral-950 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            Add payment
+          </button>
+        </div>
+      )}
     </form>
   );
 };

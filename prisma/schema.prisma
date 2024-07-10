@@ -7,62 +7,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Task{
-  id            Int       @id @default(autoincrement())
-  title         String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+model Customer {
+  id          Int       @id @default(autoincrement())
+  firstName   String
+  lastName    String?
+  phoneNumber String    @unique
+  CNIC        String    @unique
+  address     Address?
+  sales       Sale[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
-model Customer{
-  id            Int       @id @default(autoincrement())
-  firstName     String     
-  lastName      String?
-  phoneNumber   String    @unique
-  CNIC          String    @unique
-  address       Address?
-  purchases     Purchase[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+model Address {
+  id         Int       @id @default(autoincrement())
+  district   String
+  tehsil     String
+  city       String
+  detail     String
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  customerId Int       @unique
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
-model Address{
-  id            Int       @id @default(autoincrement())
-  district      String
-  tehsil        String
-  city          String
-  detail        String  
-  customer      Customer  @relation(fields: [customerId], references: [id])
-  customerId    Int       @unique
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+model Company {
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  products Product[]
 }
 
-
-model Company{
-  id            Int      @id @default(autoincrement())
-  name          String   @unique
-  products      Product[]
-}
 model Category {
-  id            Int      @id @default(autoincrement())
-  name          String   @unique
-  products      Product[] 
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  products Product[]
 }
 
 model Product {
-  id              Int      @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   model           String
   price           Int
   stock           Int
   description     String?
-  company         Company   @relation(fields: [companyId], references: [id])
+  company         Company       @relation(fields: [companyId], references: [id])
   companyId       Int
-  category        Category  @relation(fields: [categoryId], references: [id])
+  category        Category      @relation(fields: [categoryId], references: [id])
   categoryId      Int
-  productPurchase ProductPurchase[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  productSales    ProductSale[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 enum PaymentStatus {
@@ -72,63 +65,75 @@ enum PaymentStatus {
   REFUNDED
 }
 
-enum PaymentOption{
+enum PaymentOption {
   FULL_PAYMENT
   INSTALLMENT
 }
 
-model Purchase{
-  id                    Int       @id @default(autoincrement())
-  customer              Customer  @relation(fields: [customerId], references: [id])
-  customerId            Int
-  paymentStatus         PaymentStatus
-  paymentOption         PaymentOption
-  productPurchase       ProductPurchase[]
-  fullPayment           FullPayment?
-  installmentPlan       InstallmentPlan?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+model Sale {
+  id              Int              @id @default(autoincrement())
+  customer        Customer         @relation(fields: [customerId], references: [id])
+  customerId      Int
+  paymentStatus   PaymentStatus
+  paymentOption   PaymentOption
+  productSales    ProductSale[]
+  fullPayment     FullPayment?
+  installmentPlan InstallmentPlan?
+  bookRecord      BookRecord?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
-
-model ProductPurchase {
-  id          Int       @id @default(autoincrement())
-  product     Product   @relation(fields: [productId], references: [id])
+model ProductSale {
+  id          Int      @id @default(autoincrement())
+  product     Product  @relation(fields: [productId], references: [id])
   productId   Int
-  purchase    Purchase  @relation(fields: [purchaseId], references: [id])
-  purchaseId  Int
+  sale        Sale     @relation(fields: [saleId], references: [id])
+  saleId      Int
   quantity    Int
   price       Int
 }
 
 model FullPayment {
-  id              Int       @id @default(autoincrement())
-  purchase        Purchase  @relation(fields: [purchaseId], references: [id])
-  purchaseId      Int       @unique
+  id              Int   @id @default(autoincrement())
+  sale            Sale  @relation(fields: [saleId], references: [id])
+  saleId          Int   @unique
   discount        Int?
   purchaseAmount  Int
 }
 
 model InstallmentPlan {
-  id                  Int       @id @default(autoincrement())
-  purchase            Purchase  @relation(fields: [purchaseId], references: [id])
-  purchaseId          Int       @unique
-  totalPrice          Int
-  remainingPrice      Int
-  downPayment         Int 
-  installmentPeriod   Int
-  installments        Installment[]
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                Int            @id @default(autoincrement())
+  sale              Sale           @relation(fields: [saleId], references: [id])
+  saleId            Int            @unique
+  totalPrice        Int
+  remainingPrice    Int
+  downPayment       Int
+  installmentPeriod Int
+  installments      Installment[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 }
 
 model Installment {
-  id                  Int               @id @default(autoincrement())
-  installmentPlan     InstallmentPlan   @relation(fields: [installmentPlanId], references: [id])
-  installmentPlanId   Int
-  payment             Int?
-  dueDate             DateTime
-  paidAt              DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                Int              @id @default(autoincrement())
+  installmentPlan   InstallmentPlan  @relation(fields: [installmentPlanId], references: [id])
+  installmentPlanId Int
+  expectedPayment   Int
+  actualPayment     Int?
+  dueDate           DateTime
+  paidAt            DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
+
+model BookRecord {
+  id          Int      @id @default(autoincrement())
+  sale        Sale     @relation(fields: [saleId], references: [id])
+  saleId      Int      @unique
+  bookName    String
+  pageNumber  Int
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
