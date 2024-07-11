@@ -44,26 +44,13 @@ export async function getAll(page = 1, pageSize = 10) {
     skip: skip,
     take: pageSize,
     include: {
-      company: {
-        select: { name: true },
-      },
-      category: {
-        select: { name: true },
-      },
+      company: true,
+      category: true,
+      productSales: true,
     },
   });
 
   const totalCount = await prisma.product.count();
-
-  let response = [];
-  for (const result of results) {
-    const { company, category, ...productData } = result;
-    response.push({
-      company: company.name,
-      category: category.name,
-      ...productData,
-    });
-  }
 
   return {
     pagination: {
@@ -72,7 +59,7 @@ export async function getAll(page = 1, pageSize = 10) {
       currentPage: page,
       pageSize,
     },
-    products: response,
+    products: results,
   };
 }
 
@@ -95,6 +82,7 @@ export async function search({ company, category, query }: SearchParams) {
       include: {
         company: true,
         category: true,
+        productSales: true,
       },
     });
 

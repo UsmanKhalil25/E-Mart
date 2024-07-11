@@ -15,12 +15,12 @@ import {
 } from "@/lib/type";
 import { create as createSale } from "@/actions/sale/actions";
 
-import CustomerForm from "@/components/Forms/customer-form";
-import CustomerSearchBar from "@/components/Searchbars/customer-search-bar";
-import ProductSearchBar from "@/components/Searchbars/product-search-bar";
-import InstallmentForm from "@/components/Forms/installment-form";
-import FullPaymentForm from "@/components/Forms/full-payment-form";
-import BookRecordForm from "@/components/Forms/bookrecord-form";
+import CustomerForm from "@/components/Forms/CustomerForm";
+import CustomerSearchBar from "@/components/Searchbars/CustomerSearchbar";
+import ProductSearchBar from "@/components/Searchbars/ProductSearchBar";
+import InstallmentForm from "@/components/Forms/InstallmentForm";
+import FullPaymentForm from "@/components/Forms/FullPaymentForm";
+import BookRecordForm from "@/components/Forms/BookRecordForm";
 import TrashIcon from "@/components/Icons/TrashIcon";
 import PlusIcon from "@/components/Icons/PlusIcon";
 import MinusIcon from "@/components/Icons/MinusIcon";
@@ -36,12 +36,12 @@ const SaleForm = () => {
     CUSTOMER_OPTIONS.NEW
   );
 
-  const [paymentOption, setPaymentOption] = useState<PAYMENT_OPTIONS>(
-    PAYMENT_OPTIONS.FULL_PAYMENT
-  );
   const [selectedCustomer, setSelectedCustomer] = useState<Customer>();
   const [selectedProducts, setSelectedProducts] = useState<ProductWithInfo[]>(
     []
+  );
+  const [paymentOption, setPaymentOption] = useState<PAYMENT_OPTIONS>(
+    PAYMENT_OPTIONS.FULL_PAYMENT
   );
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [bookRecord, setBookRecord] = useState<BookRecordFormType>();
@@ -57,6 +57,20 @@ const SaleForm = () => {
     });
     setTotalPrice(price);
   }, [selectedProducts]);
+
+  useEffect(() => {
+    resetAll();
+  }, [customerOption]);
+
+  const resetAll = () => {
+    setSelectedCustomer(undefined);
+    setSelectedProducts([]);
+    setTotalPrice(0);
+    setPaymentOption(PAYMENT_OPTIONS.FULL_PAYMENT);
+    setBookRecord(undefined);
+    setFullPayment(undefined);
+    setInstallmentPlan(undefined);
+  };
 
   const truncatedAddress = (address: Address) => {
     return address.detail.length > 30
@@ -207,7 +221,7 @@ const SaleForm = () => {
             onClick={() => setCustomerOption(CUSTOMER_OPTIONS.NEW)}
             className={`px-3 py-2 ${
               customerOption === CUSTOMER_OPTIONS.NEW
-                ? "rounded-md bg-neutral-950 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 "
+                ? "rounded-md bg-neutral-900 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 "
                 : " text-sm font-semibold  text-gray-900"
             }`}
           >
@@ -218,7 +232,7 @@ const SaleForm = () => {
             onClick={() => setCustomerOption(CUSTOMER_OPTIONS.OLD)}
             className={`px-3 py-2 ${
               customerOption === CUSTOMER_OPTIONS.OLD
-                ? "rounded-md bg-neutral-950 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 "
+                ? "rounded-md bg-neutral-900 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 "
                 : " text-sm font-semibold  text-gray-900"
             }`}
           >
@@ -234,9 +248,9 @@ const SaleForm = () => {
           <CustomerForm onCreateCustomer={handleCreateCustomer} />
         )}
         {selectedCustomer && (
-          <div className="mt-4 max-w-xl mr-auto">
+          <div className="mt-4 w-full">
             <h2 className="text-sm font-semibold mb-2">Selected Customer:</h2>
-            <div className="bg-neutral-950 rounded-lg shadow-md py-2 px-4 flex items-center justify-between max-h-36 overflow-y-auto">
+            <div className="bg-neutral-900 rounded-lg shadow-md py-2 px-4 flex items-center justify-between max-h-36 overflow-y-auto">
               <div>
                 <p className="text-white font-semibold text-sm">
                   CNIC: {selectedCustomer.CNIC}
@@ -261,12 +275,12 @@ const SaleForm = () => {
           <ProductSearchBar onProductSelected={handleSelectProducts} />
         )}
         {selectedProducts.length > 0 && (
-          <div className="mt-4 max-w-xl mr-auto">
+          <div className="mt-4 w-full">
             <h2 className="text-sm font-semibold mb-2">Selected Products:</h2>
             {selectedProducts.map((selectedProduct) => (
               <div
                 key={selectedProduct.product.id}
-                className="bg-neutral-950 rounded-lg shadow-md py-2 px-4 flex items-center justify-between my-2"
+                className="bg-neutral-900 rounded-lg shadow-md py-2 px-4 flex items-center justify-between my-2"
               >
                 <div>
                   <p className="text-white font-semibold text-sm">
@@ -323,7 +337,7 @@ const SaleForm = () => {
               onClick={() => setPaymentOption(PAYMENT_OPTIONS.FULL_PAYMENT)}
               className={`px-3 py-2 ${
                 paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT
-                  ? "rounded-md bg-neutral-950 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 "
+                  ? "rounded-md bg-neutral-900 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 "
                   : " text-sm font-semibold  text-gray-900"
               }`}
             >
@@ -334,7 +348,7 @@ const SaleForm = () => {
               onClick={() => setPaymentOption(PAYMENT_OPTIONS.INSTALLMENT)}
               className={`px-3 py-2 ${
                 paymentOption === PAYMENT_OPTIONS.INSTALLMENT
-                  ? "rounded-md bg-neutral-950 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 "
+                  ? "rounded-md bg-neutral-900 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 "
                   : " text-sm font-semibold  text-gray-900"
               }`}
             >
@@ -359,7 +373,7 @@ const SaleForm = () => {
           <>
             <div
               className={
-                "px-3 py-2 w-28 rounded-md bg-neutral-950 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 "
+                "px-3 py-2 w-28 rounded-md bg-neutral-900 text-sm font-semibold text-white shadow-sm"
               }
             >
               Book Record

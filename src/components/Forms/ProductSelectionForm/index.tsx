@@ -11,7 +11,7 @@ interface ProductInputFormProps {
   onProductAdd: (quantityAndPrice: QuantityAndPrice) => void;
 }
 
-const ProductInputForm: React.FC<ProductInputFormProps> = ({
+const ProductSelectionForm: React.FC<ProductInputFormProps> = ({
   initialPrice,
   stock,
   onProductAdd,
@@ -106,7 +106,7 @@ const ProductInputForm: React.FC<ProductInputFormProps> = ({
         <div className="mt-6 flex items-center justify-end gap-x-6">
           <button
             onClick={handleAddProduct}
-            className="rounded-md bg-neutral-950 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             Add Product
           </button>
@@ -116,4 +116,4 @@ const ProductInputForm: React.FC<ProductInputFormProps> = ({
   );
 };
 
-export default ProductInputForm;
+export default ProductSelectionForm;

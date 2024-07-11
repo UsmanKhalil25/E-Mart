@@ -3,9 +3,13 @@ export function formatPrice(price: number) {
   return price.toLocaleString();
 }
 
+export function capitalizeWord(word: string) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 export function formatPaymentStatus(status: string) {
   const formatted = status.toLowerCase();
-  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  return capitalizeWord(formatted);
 }
 
 export function formatPaymentOption(option: PAYMENT_OPTIONS) {

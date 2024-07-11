@@ -145,6 +145,13 @@ export type Product = {
   price: number;
   stock: number;
   description: string | null;
+  productSales: {
+    id: number;
+    productId: number;
+    saleId: number;
+    quantity: number;
+    price: number;
+  }[];
   company: Company;
   category: Category;
 };
@@ -209,13 +216,43 @@ export type SaleForm = {
   bookRecord: BookRecordForm;
 };
 
+export type SaleAllType = {
+  id: number;
+  customerId: number;
+  customer: {
+    id: number;
+    firstName: string;
+    lastName: string | null;
+    phoneNumber: string;
+    CNIC: string;
+  };
+  paymentStatus: PAYMENT_STATUS;
+  paymentOption: PAYMENT_OPTIONS;
+  productSales: {
+    id: number;
+    productId: number;
+    saleId: number;
+    quantity: number;
+    price: number;
+  }[];
+  createdAt: Date;
+  updatedAt: Date;
+};
 /*
  * ProductPurchase schema
  */
 export type ProductSale = {
   id: number;
   productId: number;
-  product: Product;
+  product: {
+    id: number;
+    model: string;
+    price: number;
+    stock: number;
+    description: string | null;
+    company: Company;
+    category: Category;
+  };
   saleId: number;
   quantity: number;
   price: number;

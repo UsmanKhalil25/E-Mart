@@ -1,15 +1,17 @@
 // getAll table headers
 export const TABLE_HEADER_PRODUCT = [
+  { key: "id", label: "#" },
   { key: "company", label: "Company" },
   { key: "category", label: "Category" },
   { key: "model", label: "Model" },
   { key: "price", label: "Price" },
   { key: "stock", label: "Stock" },
-  { key: "Purchases", label: "Purchases" },
+  { key: "sales", label: "Sales" },
 ];
 
 // getAll Customers
 export const TABLE_HEADER_CUSTOMER = [
+  { key: "id", label: "#" },
   { key: "name", label: "Name" },
   { key: "phoneNumber", label: "Phone Number" },
   { key: "CNIC", label: "CNIC" },
@@ -17,8 +19,20 @@ export const TABLE_HEADER_CUSTOMER = [
   { key: "detail", label: "Address details" },
 ];
 
+// getALl Sales
+export const TABLE_HEADER_SALES = [
+  { key: "id", label: "#" },
+  { key: "customerName", label: "Customer Name" },
+  { key: "customerPhoneNumber", label: "Customer Phone Number" },
+  { key: "paymentOption", label: "Payment Option" },
+  { key: "paymentStatus", label: "Payment Status" },
+  { key: "totalAmount", label: "Total Amount" },
+  { key: "numberOfProducts", label: "Number of Product" },
+];
+
 // page: /sale/[id]
 export const TABLE_HEADER_SALE_PRODUCT = [
+  { key: "id", label: "#" },
   { key: "company", label: "Company" },
   { key: "category", label: "Category" },
   { key: "model", label: "Model" },
@@ -27,7 +41,7 @@ export const TABLE_HEADER_SALE_PRODUCT = [
 ];
 
 export const TABLE_HEADER_INSTALLMENTS = [
-  { key: "id", label: "Installment No" },
+  { key: "id", label: "#" },
   { key: "expectedPayment", label: "Expected Payment" },
   { key: "actualPayment", label: "Actual Payment" },
   { key: "dueDate", label: "Due Date" },

@@ -1,9 +1,5 @@
-import SaleForm from "@/components/Forms/sale-form";
+import SaleForm from "@/components/Forms/SaleForm";
 const SaleNewPage = () => {
-  return (
-    <>
-      <SaleForm />
-    </>
-  );
+  return <SaleForm />;
 };
 export default SaleNewPage;

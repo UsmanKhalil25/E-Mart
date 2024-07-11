@@ -12,7 +12,7 @@ import {
 import { create as createCustomer } from "@/actions/customer/actions";
 
 interface CustomerFormProps {
-  onCreateCustomer: (customer: CustomerType | undefined) => void;
+  onCreateCustomer?: (customer: CustomerType | undefined) => void;
 }
 
 const CustomerForm: React.FC<CustomerFormProps> = ({ onCreateCustomer }) => {
@@ -85,7 +85,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onCreateCustomer }) => {
     const response = await createCustomer(result.data);
     if (response.status === 201) {
       toast.success(response.message);
-      onCreateCustomer(response?.data);
+      if (onCreateCustomer) {
+        onCreateCustomer(response?.data);
+      }
     } else {
       toast.error(response.message);
     }

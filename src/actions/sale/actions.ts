@@ -102,62 +102,29 @@ export async function getAll(page = 1, pageSize = 10) {
     skip: skip,
     take: pageSize,
     include: {
-      customer: {
-        select: { firstName: true, lastName: true, phoneNumber: true },
-      },
+      customer: true,
       productSales: true,
     },
   });
 
   const totalCount = await prisma.product.count();
-  let response = [];
-  for (const result of results) {
-    const {
-      customer,
-      productSales,
-      paymentOption,
-      paymentStatus,
-      ...saleData
-    } = result;
-    response.push({
-      id: saleData.id,
-      customerName: customer.lastName
-        ? customer.firstName + " " + customer.lastName
-        : customer.firstName,
-      customerPhoneNumber: customer.phoneNumber,
-      paymentOption: paymentOption,
-      paymentStatus: paymentStatus,
-      totalAmount: result.productSales.reduce(
-        (total, item) => total + item.price,
-        0
-      ),
-      numberOfProducts: result.productSales.reduce(
-        (total, item) => total + item.quantity,
-        0
-      ),
-    });
-  }
 
   return {
-    status: 200,
-    message: "Sales fetched successfully",
-    data: {
-      pagination: {
-        totalCount,
-        totalPages: Math.ceil(totalCount / pageSize),
-        currentPage: page,
-        pageSize,
-      },
-      sales: response,
+    pagination: {
+      totalCount,
+      totalPages: Math.ceil(totalCount / pageSize),
+      currentPage: page,
+      pageSize,
     },
+    sales: results,
   };
 }
 
-export async function getOne(SaleId: number) {
+export async function getOne(saleId: number) {
   try {
     const result = await prisma.sale.findUnique({
       where: {
-        id: SaleId,
+        id: saleId,
       },
       include: {
         customer: {

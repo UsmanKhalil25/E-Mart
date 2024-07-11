@@ -1,6 +1,7 @@
+"use client";
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-
-import ProductSelectionForm from "@/components/Forms/product-selection-form";
+import { useRouter } from "next/navigation";
+import ProductSelectionForm from "@/components/Forms/ProductSelectionForm";
 import { search as searchProduct } from "@/actions/product/actions";
 import { getAll as getAllCompanies } from "@/actions/company/actions";
 import { getAll as getAllCategories } from "@/actions/category/actions";
@@ -16,12 +17,13 @@ interface ProductsWithInfo {
   price: number;
 }
 interface ProductSearchBarProps {
-  onProductSelected: (productsWithInfo: ProductsWithInfo) => void;
+  onProductSelected?: (productsWithInfo: ProductsWithInfo) => void;
 }
 
 const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
   onProductSelected,
 }) => {
+  const router = useRouter();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[] | undefined>(undefined);
@@ -50,22 +52,26 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
   };
   const handleSelectProductLocal = (product: Product) => {
     if (product.stock > 0) {
-      setSelectedProduct(product);
+      onProductSelected
+        ? setSelectedProduct(product)
+        : router.push(`/product/${product.id}`);
     }
   };
   const handleSelectProduct = (quantityAndPrice: QuantityAndPrice) => {
     if (selectedProduct) {
-      setSelectedProduct(undefined);
-      setProducts(undefined);
-      setSearchQuery("");
-      setSelectedCompany("");
-      setSelectedCategory("");
       const productWithInfo = {
         product: selectedProduct,
         price: quantityAndPrice.price,
         quantity: quantityAndPrice.quantity,
       };
-      onProductSelected(productWithInfo);
+      setSelectedProduct(undefined);
+      setProducts(undefined);
+      setSearchQuery("");
+      setSelectedCompany("");
+      setSelectedCategory("");
+      if (onProductSelected) {
+        onProductSelected(productWithInfo);
+      }
     }
   };
 
@@ -89,14 +95,14 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
     }
   };
   return (
-    <form onSubmit={handleSearch} className="max-w-xl mr-auto">
+    <form onSubmit={handleSearch} className="w-full">
       <div className="flex items-center">
         <div className="relative w-1/3">
           <select
             value={selectedCompany}
             onChange={handleCompanyChange}
             required
-            className="block border-2 border-zinc-950 w-full py-2.5 px-4 text-sm font-semibold text-white bg-neutral-950 rounded-s-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-zinc-950"
+            className="block border-2 border-neutral-900 w-full py-2.5 px-4 text-sm font-semibold text-white bg-neutral-900 rounded-s-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-zinc-950"
           >
             <option value="" disabled>
               Company
@@ -113,7 +119,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
             value={selectedCategory}
             onChange={handleCategoryChange}
             required
-            className="block border-2 border-zinc-950 w-full py-2.5 px-4 text-sm font-semibold text-white bg-neutral-950  focus:outline-none focus:ring-2 focus:ring-inset focus:ring-zinc-950"
+            className="block border-2 border-zinc-950 w-full py-2.5 px-4 text-sm font-semibold text-white bg-neutral-900  focus:outline-none focus:ring-2 focus:ring-inset focus:ring-zinc-950"
           >
             <option value="" disabled>
               Category
@@ -136,7 +142,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
           />
           <button
             type="submit"
-            className="absolute top-0 end-0 p-2.5 font-medium h-full text-white bg-neutral-950 rounded-e-lg hover:bg-neutral-900"
+            className="absolute top-0 end-0 p-2.5 font-medium h-full text-white bg-neutral-900 rounded-e-lg hover:bg-neutral-900"
           >
             <svg
               className="w-4 h-4"
@@ -202,7 +208,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
             }
           </div>
         ))}
-      {selectedProduct && (
+      {selectedProduct && onProductSelected && (
         <ProductSelectionForm
           initialPrice={selectedProduct.price}
           stock={selectedProduct.stock}

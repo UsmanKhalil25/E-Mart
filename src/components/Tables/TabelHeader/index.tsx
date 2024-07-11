@@ -11,7 +11,7 @@ interface TableHeaderProps {
 
 const TableHeader: React.FC<TableHeaderProps> = ({ columns }) => {
   return (
-    <thead className="bg-zinc-800">
+    <thead className="bg-zinc-900">
       <tr>
         {columns.map((column) => (
           <th key={column.key} className="px-4 py-2 text-white/65 text-nowrap">

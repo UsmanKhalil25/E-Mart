@@ -74,6 +74,32 @@ export async function getAll(page = 1, pageSize = 10) {
   };
 }
 
+export async function getOne(customerId: number) {
+  try {
+    const result = await prisma.customer.findUnique({
+      where: {
+        id: customerId,
+      },
+      include: {
+        address: true,
+        sales: true,
+      },
+    });
+    return {
+      status: 200,
+      message: "Sale record fetched successfully",
+      data: result,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500,
+      message: "Error fetching Sale record",
+      data: null,
+    };
+  }
+}
+
 interface SearchParams {
   field: string;
   query: string;

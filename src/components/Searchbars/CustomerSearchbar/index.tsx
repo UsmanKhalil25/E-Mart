@@ -1,4 +1,6 @@
+"use client";
 import React, { FormEvent, useState, ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
 import { search as searchCustomer } from "@/actions/customer/actions";
 import { Customer } from "@/lib/type";
 const USER_FIELDS = [
@@ -17,12 +19,13 @@ const USER_FIELDS = [
 ];
 
 interface CustomerSearchBarProps {
-  onCustomerSelected: (customer: Customer) => void;
+  onCustomerSelected?: (customer: Customer) => void;
 }
 
 const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
   onCustomerSelected,
 }) => {
+  const router = useRouter();
   const [selectedField, setSelectedField] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [customers, setCustomers] = useState<Customer[] | undefined>(undefined);
@@ -35,7 +38,9 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
     setSelectedField("");
     setSearchQuery("");
     setCustomers(undefined);
-    onCustomerSelected(customer);
+    onCustomerSelected
+      ? onCustomerSelected(customer)
+      : router.push(`/customer/${customer.id}`);
   };
 
   const handleSearch = async (event: FormEvent<HTMLFormElement>) => {
@@ -58,14 +63,14 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
   };
 
   return (
-    <form onSubmit={handleSearch} className="max-w-xl mr-auto">
+    <form onSubmit={handleSearch} className="w-full">
       <div className="flex items-center">
         <div className="relative w-1/3">
           <select
             value={selectedField}
             onChange={handleFieldChange}
             required
-            className="block border-2 border-zinc-950 w-full py-2.5 px-4 text-sm font-semibold text-white bg-neutral-950 rounded-s-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-zinc-950"
+            className="block border-2 border-zinc-800 w-full py-2.5 px-4 text-sm font-semibold text-white bg-zinc-900 rounded-s-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-zinc-950"
           >
             <option value="" disabled>
               Search Fields
@@ -88,7 +93,7 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
           />
           <button
             type="submit"
-            className="absolute top-0 end-0 p-2.5 font-medium h-full text-white bg-neutral-950 rounded-e-lg hover:bg-neutral-900"
+            className="absolute top-0 end-0 p-2.5 font-medium h-full text-white bg-zinc-900 rounded-e-lg hover:bg-neutral-900"
           >
             <svg
               className="w-4 h-4"
@@ -112,7 +117,7 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
       {customers && customers.length > 0 && (
         <div className="mt-4">
           <h2 className="text-sm font-semibold mb-2">Customers Found:</h2>
-          <ul className="space-y-2">
+          <ul className="space-y-2 max-h-40 overflow-y-auto">
             {customers.map((customer) => (
               <li
                 onClick={() => handleSelectCustomer(customer)}
