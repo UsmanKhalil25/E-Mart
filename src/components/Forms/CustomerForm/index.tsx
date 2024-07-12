@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import {
@@ -9,13 +10,20 @@ import {
   CustomerForm as CustomerFormType,
   Customer as CustomerType,
 } from "@/lib/type";
-import { create as createCustomer } from "@/actions/customer/actions";
+import {
+  create as createCustomer,
+  update as updateCustomer,
+} from "@/actions/customer/actions";
 
 interface CustomerFormProps {
-  onCreateCustomer?: (customer: CustomerType | undefined) => void;
+  onSubmitCustomer?: (customer: CustomerType | undefined) => void;
+  existingCustomer?: CustomerType;
 }
 
-const CustomerForm: React.FC<CustomerFormProps> = ({ onCreateCustomer }) => {
+const CustomerForm: React.FC<CustomerFormProps> = ({
+  onSubmitCustomer,
+  existingCustomer,
+}) => {
   const {
     register,
     handleSubmit,
@@ -26,13 +34,20 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onCreateCustomer }) => {
   } = useForm<CustomerFormType>({
     resolver: zodResolver(CustomerFormSchema),
     defaultValues: {
+      firstName: existingCustomer?.firstName || "",
+      lastName: existingCustomer?.lastName || "",
+      CNIC: existingCustomer?.CNIC || "",
+      phoneNumber: existingCustomer?.phoneNumber || "",
       address: {
-        city: "Dinga",
-        tehsil: "Kharian",
-        district: "Gujrat",
+        district: existingCustomer?.address?.district || "",
+        tehsil: existingCustomer?.address?.tehsil || "",
+        city: existingCustomer?.address?.city || "",
+        detail: existingCustomer?.address?.detail || "",
       },
     },
   });
+
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
   const formatCNIC = (value: string) => {
@@ -68,7 +83,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onCreateCustomer }) => {
     }
   };
 
-  const onSubmit = async (data: CustomerFormType) => {
+  const createNewCustomer = async (data: CustomerFormType) => {
     setLoading(true);
     const result = CustomerFormSchema.safeParse(data);
     if (!result.success) {
@@ -85,13 +100,50 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onCreateCustomer }) => {
     const response = await createCustomer(result.data);
     if (response.status === 201) {
       toast.success(response.message);
-      if (onCreateCustomer) {
-        onCreateCustomer(response?.data);
+      if (onSubmitCustomer) {
+        onSubmitCustomer(response?.data);
       }
     } else {
       toast.error(response.message);
     }
     setLoading(false);
+  };
+
+  const updateExistingCustomer = async (data: CustomerFormType) => {
+    if (existingCustomer) {
+      setLoading(true);
+      const result = CustomerFormSchema.safeParse(data);
+      if (!result.success) {
+        console.error(result.error);
+        result.error.issues.forEach((issue) => {
+          setError(issue.path[0] as keyof CustomerFormType, {
+            type: "manual",
+            message: issue.message,
+          });
+        });
+        setLoading(false);
+        return;
+      }
+      const payload = {
+        id: existingCustomer?.id,
+        updatedCustomer: result.data,
+      };
+      const response = await updateCustomer(payload);
+      if (response.status === 200) {
+        toast.success(response.message);
+      } else {
+        toast.error(response.message);
+      }
+      setLoading(false);
+    }
+  };
+  const onSubmit = async (data: CustomerFormType) => {
+    if (existingCustomer) {
+      await updateExistingCustomer(data);
+    } else {
+      await createNewCustomer(data);
+    }
+    router.push("/customer");
   };
 
   return (

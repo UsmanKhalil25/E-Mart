@@ -66,6 +66,7 @@ const ProductTable = () => {
           <TableHeader columns={TABLE_HEADER} />
           <TableBody
             columns={TABLE_HEADER}
+            redirectionUrl="/product"
             data={getPreparedDataProducts(data.products)}
           />
         </table>

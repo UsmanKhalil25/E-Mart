@@ -4,6 +4,7 @@ import {
   PAYMENT_OPTIONS,
   PAYMENT_STATUS,
   SaleForm,
+  Sale,
   FullPaymentForm,
   InstallmentPlanForm,
 } from "@/lib/type";
@@ -162,6 +163,134 @@ export async function getOne(saleId: number) {
       status: 500,
       message: "Error fetching Sale record",
       data: null,
+    };
+  }
+}
+
+interface SearchParams {
+  field: string;
+  query: string;
+}
+export async function search({ field, query }: SearchParams) {
+  if (!field || !query) {
+    return { status: 400, message: "Field or query is missing", data: [] };
+  }
+  try {
+    let sales: Sale[] = [];
+    switch (field) {
+      case "firstName":
+        sales = await prisma.sale.findMany({
+          where: {
+            customer: {
+              firstName: { contains: query as string, mode: "insensitive" },
+            },
+          },
+          include: {
+            customer: {
+              include: {
+                address: true,
+              },
+            },
+            fullPayment: true,
+            installmentPlan: {
+              include: {
+                installments: true,
+              },
+            },
+            productSales: {
+              include: {
+                product: {
+                  include: {
+                    company: true,
+                    category: true,
+                  },
+                },
+              },
+            },
+            bookRecord: true,
+          },
+        });
+        break;
+      case "phoneNumber":
+        sales = await prisma.sale.findMany({
+          where: {
+            customer: {
+              phoneNumber: { contains: query as string },
+            },
+          },
+          include: {
+            customer: {
+              include: {
+                address: true,
+              },
+            },
+            fullPayment: true,
+            installmentPlan: {
+              include: {
+                installments: true,
+              },
+            },
+            productSales: {
+              include: {
+                product: {
+                  include: {
+                    company: true,
+                    category: true,
+                  },
+                },
+              },
+            },
+            bookRecord: true,
+          },
+        });
+        break;
+      case "CNIC":
+        sales = await prisma.sale.findMany({
+          where: {
+            customer: {
+              CNIC: {
+                contains: query as string,
+              },
+            },
+          },
+          include: {
+            customer: {
+              include: {
+                address: true,
+              },
+            },
+            fullPayment: true,
+            installmentPlan: {
+              include: {
+                installments: true,
+              },
+            },
+            productSales: {
+              include: {
+                product: {
+                  include: {
+                    company: true,
+                    category: true,
+                  },
+                },
+              },
+            },
+            bookRecord: true,
+          },
+        });
+        break;
+    }
+    return {
+      status: 200,
+      message: "Sales fetched successfully",
+      data: sales,
+    };
+  } catch (error) {
+    console.error("Error fetching sales: ", error);
+    return {
+      status: 500,
+      message: "An error occurred while fetching sales",
+      data: [],
     };
   }
 }

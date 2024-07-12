@@ -16,7 +16,7 @@ const CustomerDetailPage = async ({ params }: { params: { id: string } }) => {
       title={"Customer Information"}
       description={"Here is the complete information about the customer"}
     >
-      <CustomerDetailSection customer={customer} />
+      <CustomerDetailSection customer={customer} showEditButton={true} />
     </DetailWrapper>
   );
 };

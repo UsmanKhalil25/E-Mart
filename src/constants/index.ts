@@ -32,7 +32,7 @@ export const TABLE_HEADER_SALES = [
 
 // page: /sale/[id]
 export const TABLE_HEADER_SALE_PRODUCT = [
-  { key: "id", label: "#" },
+  { key: "key", label: "#" },
   { key: "company", label: "Company" },
   { key: "category", label: "Category" },
   { key: "model", label: "Model" },
@@ -41,7 +41,7 @@ export const TABLE_HEADER_SALE_PRODUCT = [
 ];
 
 export const TABLE_HEADER_INSTALLMENTS = [
-  { key: "id", label: "#" },
+  { key: "key", label: "#" },
   { key: "expectedPayment", label: "Expected Payment" },
   { key: "actualPayment", label: "Actual Payment" },
   { key: "dueDate", label: "Due Date" },

@@ -87,14 +87,14 @@ export async function getOne(customerId: number) {
     });
     return {
       status: 200,
-      message: "Sale record fetched successfully",
+      message: "Customer information fetched successfully",
       data: result,
     };
   } catch (error) {
     console.error(error);
     return {
       status: 500,
-      message: "Error fetching Sale record",
+      message: "Error fetching customer information",
       data: null,
     };
   }
@@ -143,6 +143,51 @@ export async function search({ field, query }: SearchParams) {
       status: 500,
       message: "An error occurred while fetching customers",
       data: [],
+    };
+  }
+}
+
+interface UpdateParams {
+  id: number;
+  updatedCustomer: CustomerForm;
+}
+
+export async function update({ id, updatedCustomer }: UpdateParams) {
+  try {
+    const updatedCustomerData = await prisma.customer.update({
+      where: {
+        id: id,
+      },
+      data: {
+        firstName: updatedCustomer.firstName,
+        lastName: updatedCustomer.lastName,
+        phoneNumber: updatedCustomer.phoneNumber,
+        CNIC: updatedCustomer.CNIC,
+        address: {
+          update: {
+            city: updatedCustomer.address?.city,
+            district: updatedCustomer.address?.district,
+            tehsil: updatedCustomer.address?.tehsil,
+            detail: updatedCustomer.address?.detail,
+          },
+        },
+      },
+      include: {
+        address: true,
+      },
+    });
+
+    return {
+      status: 200,
+      message: "Customer updated successfully",
+      data: updatedCustomerData,
+    };
+  } catch (error) {
+    console.error("Error updating customer: ", error);
+    return {
+      status: 500,
+      message: "An error occurred while updating customer",
+      data: null,
     };
   }
 }

@@ -4,26 +4,44 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Select from "react-select";
+import toast from "react-hot-toast";
 import {
   ProductFormSchema,
-  ProductFrom as ProductFormType,
+  ProductForm as ProductFormType,
+  Product as ProductType,
   Company,
   Category,
 } from "@/lib/type";
 import { getAll as getAllCategories } from "@/actions/category/actions";
 import { getAll as getAllCompanies } from "@/actions/company/actions";
-import { create as createProduct } from "@/actions/product/actions";
+import {
+  create as createProduct,
+  update as updateProduct,
+} from "@/actions/product/actions";
 import { useRouter } from "next/navigation";
-export default function ProductForm() {
+
+interface ProductFormProps {
+  existingProduct?: ProductType;
+}
+
+const ProductForm: React.FC<ProductFormProps> = ({ existingProduct }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    setError,
     watch,
   } = useForm<ProductFormType>({
     resolver: zodResolver(ProductFormSchema),
-    defaultValues: {},
+    defaultValues: {
+      model: existingProduct?.model || "",
+      company: existingProduct?.company.name || "",
+      category: existingProduct?.category.name || "",
+      price: existingProduct?.price || 0,
+      stock: existingProduct?.stock || 0,
+      description: existingProduct?.description || "",
+    },
   });
 
   const router = useRouter();
@@ -31,6 +49,7 @@ export default function ProductForm() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [formattedPrice, setFormattedPrice] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchData = async () => {
       const companiesRes = await getAllCompanies();
@@ -43,17 +62,16 @@ export default function ProductForm() {
     fetchData();
   }, []);
 
-  const onSubmit = async (data: ProductFormType) => {
-    setLoading(true);
-    const result = ProductFormSchema.safeParse(data);
-    if (!result.success) {
-      console.error(result.error);
-      return;
-    }
-    await createProduct(data);
-    setLoading(false);
-    router.push("/product");
-  };
+  useEffect(() => {
+    const subscription = watch((value) => {
+      if (value.price) {
+        setFormattedPrice(formatPrice(value.price));
+      } else {
+        setFormattedPrice("");
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const companyOptions = companies.map((company) => ({
     value: company.name,
@@ -69,16 +87,66 @@ export default function ProductForm() {
     return price.toLocaleString();
   };
 
-  useEffect(() => {
-    const subscription = watch((value) => {
-      if (value.price) {
-        setFormattedPrice(formatPrice(value.price));
-      } else {
-        setFormattedPrice("");
+  const createNewProduct = async (data: ProductFormType) => {
+    setLoading(true);
+    const result = ProductFormSchema.safeParse(data);
+    if (!result.success) {
+      console.error(result.error);
+      result.error.issues.forEach((issue) => {
+        setError(issue.path[0] as keyof ProductFormType, {
+          type: "manual",
+          message: issue.message,
+        });
+      });
+      setLoading(false);
+      return;
+    }
+    const response = await createProduct(result.data);
+    if (response.status === 201) {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+    setLoading(false);
+  };
+
+  const updateExistingProduct = async (data: ProductFormType) => {
+    if (existingProduct) {
+      setLoading(true);
+      const result = ProductFormSchema.safeParse(data);
+      if (!result.success) {
+        console.error(result.error);
+        result.error.issues.forEach((issue) => {
+          setError(issue.path[0] as keyof ProductFormType, {
+            type: "manual",
+            message: issue.message,
+          });
+        });
+        setLoading(false);
+        return;
       }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
+      const payload = {
+        id: existingProduct?.id,
+        updatedProduct: result.data,
+      };
+      const response = await updateProduct(payload);
+      if (response.status === 200) {
+        toast.success(response.message);
+      } else {
+        toast.error(response.message);
+      }
+      setLoading(false);
+    }
+  };
+
+  const onSubmit = async (data: ProductFormType) => {
+    if (existingProduct) {
+      await updateExistingProduct(data);
+    } else {
+      await createNewProduct(data);
+    }
+    router.push("/product");
+  };
 
   return (
     <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
@@ -97,6 +165,11 @@ export default function ProductForm() {
               onChange={(selectedOption) => {
                 setValue("company", selectedOption?.value || "");
               }}
+              value={
+                companyOptions.find(
+                  (option) => option.value === existingProduct?.company.name
+                ) || null
+              }
             />
           </div>
           {errors.company && (
@@ -120,6 +193,11 @@ export default function ProductForm() {
               onChange={(selectedOption) => {
                 setValue("category", selectedOption?.value || "");
               }}
+              value={
+                categoryOptions.find(
+                  (option) => option.value === existingProduct?.category.name
+                ) || null
+              }
             />
           </div>
           {errors.category && (
@@ -236,4 +314,6 @@ export default function ProductForm() {
       </div>
     </form>
   );
-}
+};
+
+export default ProductForm;

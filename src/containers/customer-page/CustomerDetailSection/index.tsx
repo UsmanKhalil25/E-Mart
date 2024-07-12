@@ -1,13 +1,24 @@
 import { Customer as CustomerType } from "@/lib/type";
+import RedirectButton from "@/components/Buttons/RedirectButton";
 interface CustomerDetailSectionProps {
   customer: CustomerType;
+  showEditButton?: boolean;
 }
 const CustomerDetailSection: React.FC<CustomerDetailSectionProps> = ({
   customer,
+  showEditButton,
 }) => {
   return (
     <section className="mt-10">
-      <h2 className="text-sm text-gray-600">Customer Information</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-sm text-gray-600">Customer Information</h2>
+        {showEditButton && (
+          <RedirectButton
+            redirectionUrl={`/customer/edit/${customer.id}`}
+            label={"Edit Customer"}
+          />
+        )}
+      </div>
       <div className="mt-4 grid grid-cols-1 gap-x-3 gap-y-4 sm:grid-cols-2">
         <div className="bg-white shadow rounded-md p-4">
           <p className="text-sm font-medium text-gray-500">Name</p>

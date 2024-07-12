@@ -5,15 +5,12 @@ import TableHeader from "@/components/Tables/TabelHeader";
 import TableBody from "@/components/Tables/TableBody";
 import DetailWrapper from "@/components/Wrappers/DetailWrapper";
 import CustomerDetailSection from "@/containers/customer-page/CustomerDetailSection";
-import {
-  TABLE_HEADER_SALE_PRODUCT,
-  TABLE_HEADER_INSTALLMENTS,
-} from "@/constants/index";
-
+import InstallmentTable from "@/containers/sale-page/InstallmentTable";
+import { TABLE_HEADER_SALE_PRODUCT } from "@/constants/index";
+import EditInstallmentModal from "@/components/Modals/EditInstallmentModal";
 import {
   Sale as SaleType,
   ProductSale as ProductSaleType,
-  Installment as InstallmentType,
   PAYMENT_STATUS,
   PAYMENT_OPTIONS,
 } from "@/lib/type";
@@ -21,7 +18,6 @@ import {
   formatPrice,
   formatPaymentStatus,
   formatPaymentOption,
-  formatDate,
 } from "@/utils/string-utils";
 
 const SaleDetailPage = async ({ params }: { params: { id: string } }) => {
@@ -55,38 +51,19 @@ const SaleDetailPage = async ({ params }: { params: { id: string } }) => {
   };
 
   const getPreparedDataProducts = (sale: SaleType) => {
-    return sale.productSales.map((item) => {
-      const id = item.id;
+    return sale.productSales.map((item, key) => {
       const quantity = item.quantity;
       const price = item.price;
       const company = item.product.company.name;
       const category = item.product.category.name;
       const model = item.product.model;
       return {
-        id,
+        key: key + 1,
         quantity,
         price,
         company,
         category,
         model,
-      };
-    });
-  };
-
-  const getPreparedDataInstallments = (installments?: InstallmentType[]) => {
-    return installments?.map((item) => {
-      console.log("installment: ", item);
-      const id = item.id;
-      const expectedPayment = item.expectedPayment;
-      const actualPayment = item.actualPayment;
-      const dueDate = item.dueDate;
-      const paidAt = item.paidAt;
-      return {
-        id,
-        expectedPayment,
-        actualPayment: actualPayment ? actualPayment : 0,
-        dueDate: formatDate(dueDate),
-        paidAt: paidAt ? formatDate(paidAt) : "Not paid yet",
       };
     });
   };
@@ -218,17 +195,7 @@ const SaleDetailPage = async ({ params }: { params: { id: string } }) => {
                 </p>
               </div>
             </div>
-            <div className="mt-4 overflow-x-auto rounded-md">
-              <table className="table-auto w-full text-left whitespace-no-wrap">
-                <TableHeader columns={TABLE_HEADER_INSTALLMENTS} />
-                <TableBody
-                  columns={TABLE_HEADER_INSTALLMENTS}
-                  data={getPreparedDataInstallments(
-                    sale.installmentPlan?.installments
-                  )}
-                />
-              </table>
-            </div>
+            <InstallmentTable sale={sale} />
           </div>
         )}
       </div>

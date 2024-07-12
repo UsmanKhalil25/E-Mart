@@ -245,7 +245,7 @@ const SaleForm = () => {
             <CustomerSearchBar onCustomerSelected={handleSelectCustomer} />
           </div>
         ) : (
-          <CustomerForm onCreateCustomer={handleCreateCustomer} />
+          <CustomerForm onSubmitCustomer={handleCreateCustomer} />
         )}
         {selectedCustomer && (
           <div className="mt-4 w-full">
