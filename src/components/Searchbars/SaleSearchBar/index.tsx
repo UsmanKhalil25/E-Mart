@@ -30,8 +30,34 @@ const SaleSearchBar = ({}) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sales, setSales] = useState<SaleType[] | undefined>(undefined);
 
+  const formatCNIC = (value: string) => {
+    const cnic = value.replace(/\D/g, "").slice(0, 13);
+    if (cnic.length <= 5) return cnic;
+    if (cnic.length <= 13) return `${cnic.slice(0, 5)}-${cnic.slice(5)}`;
+    return `${cnic.slice(0, 5)}-${cnic.slice(5, 12)}${cnic.slice(12)}`;
+  };
+
+  const formatPhoneNumber = (value: string) => {
+    const phone = value.replace(/\D/g, "").slice(0, 11);
+    if (phone.length <= 4) return phone;
+    return `${phone.slice(0, 4)}-${phone.slice(4)}`;
+  };
+
   const handleFieldChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedField(event.target.value);
+    setSearchQuery("");
+    setSales(undefined);
+  };
+
+  const handleSearchQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
+    let value = event.target.value;
+    if (selectedField === "CNIC") {
+      setSearchQuery(formatCNIC(value));
+    } else if (selectedField === "phoneNumber") {
+      setSearchQuery(formatPhoneNumber(value));
+    } else if (selectedField === "firstName") {
+      setSearchQuery(value);
+    }
   };
 
   const handleSelectSale = (sale: SaleType) => {
@@ -87,7 +113,7 @@ const SaleSearchBar = ({}) => {
             placeholder="Search Sale"
             required
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchQueryChange}
           />
           <button
             type="submit"
@@ -130,7 +156,7 @@ const SaleSearchBar = ({}) => {
                     Payment Status: {formatPaymentStatus(sale.paymentStatus)}
                   </p>
                   <p className="text-gray-900 font-semibold text-sm">
-                    Payment Amont:{" "}
+                    Payment Amount:{" "}
                     {formatPrice(
                       sale.productSales.reduce(
                         (total, item) => total + item.price,

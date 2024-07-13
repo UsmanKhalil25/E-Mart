@@ -62,7 +62,7 @@ const CustomerTable = () => {
           <TableHeader columns={TABLE_HEADER} />
           <TableBody
             columns={TABLE_HEADER}
-            redirectionUrl="/customer"
+            redirectionUrl={{ pathname: "/customer" }}
             data={getPreparedDataCustomers(data.customers)}
           />
         </table>

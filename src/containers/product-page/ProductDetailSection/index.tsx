@@ -11,7 +11,9 @@ const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
       <div className="flex justify-between items-center">
         <h2 className="text-sm text-gray-600">Customer Information</h2>
         <RedirectButton
-          redirectionUrl={`/product/edit/${product.id}`}
+          redirectionUrl={{
+            pathname: `/product/edit/${product.id}`,
+          }}
           label={"Edit Product"}
         />
       </div>

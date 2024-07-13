@@ -18,7 +18,7 @@ const MainWrapper: React.FC<MainWrapperProps> = ({
         </h3>
         <RedirectButton
           label={`Add new ${pageName.toLowerCase()}`}
-          redirectionUrl={redirectionUrl}
+          redirectionUrl={{ pathname: redirectionUrl }}
         />
       </div>
 

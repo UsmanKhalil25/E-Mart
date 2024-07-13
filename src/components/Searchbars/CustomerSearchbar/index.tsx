@@ -3,6 +3,7 @@ import React, { FormEvent, useState, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { search as searchCustomer } from "@/actions/customer/actions";
 import { Customer } from "@/lib/type";
+
 const USER_FIELDS = [
   {
     id: "firstName",
@@ -30,8 +31,34 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [customers, setCustomers] = useState<Customer[] | undefined>(undefined);
 
+  const formatCNIC = (value: string) => {
+    const cnic = value.replace(/\D/g, "").slice(0, 13);
+    if (cnic.length <= 5) return cnic;
+    if (cnic.length <= 13) return `${cnic.slice(0, 5)}-${cnic.slice(5)}`;
+    return `${cnic.slice(0, 5)}-${cnic.slice(5, 12)}${cnic.slice(12)}`;
+  };
+
+  const formatPhoneNumber = (value: string) => {
+    const phone = value.replace(/\D/g, "").slice(0, 11);
+    if (phone.length <= 4) return phone;
+    return `${phone.slice(0, 4)}-${phone.slice(4)}`;
+  };
+
   const handleFieldChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedField(event.target.value);
+    setSearchQuery("");
+    setCustomers(undefined);
+  };
+
+  const handleSearchQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
+    let value = event.target.value;
+    if (selectedField === "CNIC") {
+      setSearchQuery(formatCNIC(value));
+    } else if (selectedField === "phoneNumber") {
+      setSearchQuery(formatPhoneNumber(value));
+    } else if (selectedField === "firstName") {
+      setSearchQuery(value);
+    }
   };
 
   const handleSelectCustomer = (customer: Customer) => {
@@ -48,6 +75,7 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
     if (!selectedField || !searchQuery) {
       return;
     }
+
     try {
       const response = await searchCustomer({
         field: selectedField,
@@ -89,7 +117,7 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
             placeholder="Search customer"
             required
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchQueryChange}
           />
           <button
             type="submit"

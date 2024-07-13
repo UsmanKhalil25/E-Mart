@@ -14,7 +14,9 @@ const CustomerDetailSection: React.FC<CustomerDetailSectionProps> = ({
         <h2 className="text-sm text-gray-600">Customer Information</h2>
         {showEditButton && (
           <RedirectButton
-            redirectionUrl={`/customer/edit/${customer.id}`}
+            redirectionUrl={{
+              pathname: `/customer/edit/${customer.id}`,
+            }}
             label={"Edit Customer"}
           />
         )}

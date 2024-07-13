@@ -71,7 +71,7 @@ const SaleTable = () => {
           <TableBody
             columns={TABLE_HEADER}
             data={getPreparedDataSales(data.sales)}
-            redirectionUrl={"/sale"}
+            redirectionUrl={{ pathname: "/sale" }}
           />
         </table>
       </div>
