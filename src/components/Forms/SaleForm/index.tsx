@@ -19,6 +19,7 @@ import CustomerForm from "@/components/Forms/CustomerForm";
 import CustomerSearchBar from "@/components/Searchbars/CustomerSearchbar";
 import ProductSearchBar from "@/components/Searchbars/ProductSearchBar";
 import InstallmentForm from "@/components/Forms/InstallmentForm";
+import InstallmentPlanForm from "@/components/Forms/InstallmentPlanForm";
 import FullPaymentForm from "@/components/Forms/FullPaymentForm";
 import BookRecordForm from "@/components/Forms/BookRecordForm";
 import TrashIcon from "@/components/Icons/TrashIcon";
@@ -363,7 +364,7 @@ const SaleForm = () => {
               onFullPaymentAdd={handleAddFullPayment}
             />
           ) : (
-            <InstallmentForm
+            <InstallmentPlanForm
               totalPayment={totalPrice}
               onInstallmentAdd={handleAddInstallment}
             />

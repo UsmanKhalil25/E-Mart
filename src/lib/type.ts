@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+/**
+ *
+ * LinkObj
+ *
+ */
+export type LinkObj = {
+  pathname: string;
+  query?: {};
+};
+
 /*
  * Address schema
  */
@@ -343,7 +353,7 @@ export type InstallmentPlan = {
 /*
  * Installment schema
  */
-export const InstallmentFormSchema = z.object({
+export const InstallmentEditFormSchema = z.object({
   actualPayment: z
     .number({
       required_error: "Please provide the actual installment payment",
@@ -367,7 +377,22 @@ export const InstallmentFormSchema = z.object({
       message: "Expected payment cannot be negative",
     }),
 });
-export type InstallmentForm = z.infer<typeof InstallmentFormSchema>;
+export type InstallmentEditForm = z.infer<typeof InstallmentEditFormSchema>;
+
+export const InstallmentNewFormSchema = z.object({
+  dueDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date",
+  }),
+  expectedPayment: z
+    .number({
+      required_error: "Please provide the expected installment amount",
+    })
+    .int()
+    .nonnegative({
+      message: "Expected payment cannot be negative",
+    }),
+});
+export type InstallmentNewForm = z.infer<typeof InstallmentNewFormSchema>;
 
 export type Installment = {
   id: number;

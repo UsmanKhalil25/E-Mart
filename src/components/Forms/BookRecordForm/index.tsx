@@ -24,7 +24,6 @@ const BookRecordForm: React.FC<BookRecordFormProps> = ({
   });
 
   const onSubmit = (data: BookRecordFormType) => {
-    console.log("Form Submitted with data: ", data);
     onAddBookRecord(data);
   };
 

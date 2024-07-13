@@ -7,7 +7,6 @@ import DetailWrapper from "@/components/Wrappers/DetailWrapper";
 import CustomerDetailSection from "@/containers/customer-page/CustomerDetailSection";
 import InstallmentTable from "@/containers/sale-page/InstallmentTable";
 import { TABLE_HEADER_SALE_PRODUCT } from "@/constants/index";
-import EditInstallmentModal from "@/components/Modals/EditInstallmentModal";
 import {
   Sale as SaleType,
   ProductSale as ProductSaleType,

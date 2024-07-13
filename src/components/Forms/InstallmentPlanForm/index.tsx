@@ -7,12 +7,12 @@ import {
 } from "@/lib/type";
 import { formatPrice } from "@/utils/string-utils";
 
-interface InstallmentFormProps {
+interface InstallmentPlanFormProps {
   totalPayment?: number;
   onInstallmentAdd: (data: InstallmentPlanFormType) => void;
 }
 
-const InstallmentForm: React.FC<InstallmentFormProps> = ({
+const InstallmentPlanForm: React.FC<InstallmentPlanFormProps> = ({
   totalPayment,
   onInstallmentAdd,
 }) => {
@@ -198,4 +198,4 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({
   );
 };
 
-export default InstallmentForm;
+export default InstallmentPlanForm;

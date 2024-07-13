@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { LinkObj } from "@/lib/type";
+
 interface RedirectButtonProps {
-  redirectionUrl: string;
+  redirectionUrl: LinkObj;
   label: string;
 }
 const RedirectButton: React.FC<RedirectButtonProps> = ({
