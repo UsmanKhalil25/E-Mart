@@ -4,6 +4,7 @@ import { getOne as getOneSale } from "@/actions/sale/actions";
 import TableHeader from "@/components/Tables/TabelHeader";
 import TableBody from "@/components/Tables/TableBody";
 import DetailWrapper from "@/components/Wrappers/DetailWrapper";
+import RedirectButton from "@/components/Buttons/RedirectButton";
 import CustomerDetailSection from "@/containers/customer-page/CustomerDetailSection";
 import InstallmentTable from "@/containers/sale-page/InstallmentTable";
 import { TABLE_HEADER_SALE_PRODUCT } from "@/constants/index";
@@ -72,7 +73,15 @@ const SaleDetailPage = async ({ params }: { params: { id: string } }) => {
       title={"Sale Record Information"}
       description={"Here is the complete information about the Sale."}
     >
-      <div className=" flex justify-between items-center mt-10 shadow rounded-md bg-white px-3 py-5">
+      <div className="flex justify-end mt-10">
+        <RedirectButton
+          redirectionUrl={{
+            pathname: `/sale/invoice/${sale.id}`,
+          }}
+          label="Generate Invoice"
+        />
+      </div>
+      <div className=" flex justify-between items-center mt-5 shadow rounded-md bg-white px-3 py-5">
         <div className="flex gap-2 items-end">
           <h1 className="text-5xl font-bold">
             Rs. {formatPrice(getTotalSale(sale.productSales))}{" "}

@@ -245,6 +245,8 @@ export type SaleAllType = {
     quantity: number;
     price: number;
   }[];
+  fullPayment: FullPayment | null;
+  installmentPlan: InstallmentPlan | null;
   createdAt: Date;
   updatedAt: Date;
 };

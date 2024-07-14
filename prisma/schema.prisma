@@ -25,7 +25,7 @@ model Address {
   tehsil     String
   city       String
   detail     String
-  customer   Customer  @relation(fields: [customerId], references: [id])
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId Int       @unique
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -49,9 +49,9 @@ model Product {
   price           Int
   stock           Int
   description     String?
-  company         Company       @relation(fields: [companyId], references: [id])
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId       Int
-  category        Category      @relation(fields: [categoryId], references: [id])
+  category        Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId      Int
   productSales    ProductSale[]
   createdAt       DateTime      @default(now())
@@ -72,7 +72,7 @@ enum PaymentOption {
 
 model Sale {
   id              Int              @id @default(autoincrement())
-  customer        Customer         @relation(fields: [customerId], references: [id])
+  customer        Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId      Int
   paymentStatus   PaymentStatus
   paymentOption   PaymentOption
@@ -86,9 +86,9 @@ model Sale {
 
 model ProductSale {
   id          Int      @id @default(autoincrement())
-  product     Product  @relation(fields: [productId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id],onDelete: Cascade)
   productId   Int
-  sale        Sale     @relation(fields: [saleId], references: [id])
+  sale        Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
   saleId      Int
   quantity    Int
   price       Int
@@ -96,7 +96,7 @@ model ProductSale {
 
 model FullPayment {
   id              Int   @id @default(autoincrement())
-  sale            Sale  @relation(fields: [saleId], references: [id])
+  sale            Sale  @relation(fields: [saleId], references: [id], onDelete: Cascade)
   saleId          Int   @unique
   discount        Int?
   purchaseAmount  Int
@@ -104,7 +104,7 @@ model FullPayment {
 
 model InstallmentPlan {
   id                Int            @id @default(autoincrement())
-  sale              Sale           @relation(fields: [saleId], references: [id])
+  sale              Sale           @relation(fields: [saleId], references: [id], onDelete: Cascade)
   saleId            Int            @unique
   totalPrice        Int
   remainingPrice    Int
@@ -117,7 +117,7 @@ model InstallmentPlan {
 
 model Installment {
   id                Int              @id @default(autoincrement())
-  installmentPlan   InstallmentPlan  @relation(fields: [installmentPlanId], references: [id])
+  installmentPlan   InstallmentPlan  @relation(fields: [installmentPlanId], references: [id],onDelete: Cascade)
   installmentPlanId Int
   expectedPayment   Int
   actualPayment     Int?
@@ -129,7 +129,7 @@ model Installment {
 
 model BookRecord {
   id          Int      @id @default(autoincrement())
-  sale        Sale     @relation(fields: [saleId], references: [id])
+  sale        Sale     @relation(fields: [saleId], references: [id],onDelete: Cascade)
   saleId      Int      @unique
   bookName    String
   pageNumber  Int

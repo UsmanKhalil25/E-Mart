@@ -52,6 +52,24 @@ export async function create(newProduct: ProductForm) {
   }
 }
 
+export async function getAllNoStock() {
+  const results = await prisma.product.findMany({
+    where: {
+      stock: 0,
+    },
+    include: {
+      company: true,
+      category: true,
+      productSales: true,
+    },
+  });
+  return {
+    status: 200,
+    message: "Products with no stock fetched successfully",
+    data: results,
+  };
+}
+
 export async function getAll(page = 1, pageSize = 10) {
   const skip = (page - 1) * pageSize;
 

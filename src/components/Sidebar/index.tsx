@@ -3,7 +3,6 @@
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 const mainRoutes = [
   { name: "Home", path: "/", requiresAuth: false },

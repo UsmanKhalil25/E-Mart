@@ -1,3 +1,8 @@
+//E-MART information
+export const EMART_INFO = {
+  address: "Bashir Plaza, Dhalian Chowk, Dinga, Gujrat.",
+  phoneNumber: "0333-6278617",
+};
 // getAll table headers
 export const TABLE_HEADER_PRODUCT = [
   { key: "id", label: "#" },

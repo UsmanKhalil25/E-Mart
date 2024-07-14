@@ -96,6 +96,28 @@ export async function create(newSale: SaleForm) {
   }
 }
 
+export async function getAllPending() {
+  const results = await prisma.sale.findMany({
+    where: {
+      paymentStatus: PAYMENT_STATUS.PENDING,
+    },
+    include: {
+      customer: true,
+      productSales: true,
+      installmentPlan: {
+        include: {
+          installments: true,
+        },
+      },
+      fullPayment: true,
+    },
+  });
+  return {
+    status: 200,
+    message: "Sales with pending payment fetched successfully",
+    data: results,
+  };
+}
 export async function getAll(page = 1, pageSize = 10) {
   const skip = (page - 1) * pageSize;
 
@@ -105,6 +127,12 @@ export async function getAll(page = 1, pageSize = 10) {
     include: {
       customer: true,
       productSales: true,
+      installmentPlan: {
+        include: {
+          installments: true,
+        },
+      },
+      fullPayment: true,
     },
   });
 
