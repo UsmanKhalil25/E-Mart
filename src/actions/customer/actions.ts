@@ -1,7 +1,7 @@
 "use server";
 import prisma from "@/lib/db";
 import { CustomerFormSchema, CustomerForm, Customer } from "@/lib/type";
-
+import { revalidatePath } from "next/cache";
 export async function create(newCustomer: CustomerForm) {
   try {
     const result = CustomerFormSchema.safeParse(newCustomer);
@@ -176,6 +176,7 @@ export async function update({ id, updatedCustomer }: UpdateParams) {
         address: true,
       },
     });
+    revalidatePath(`/customer/${id}`);
 
     return {
       status: 200,

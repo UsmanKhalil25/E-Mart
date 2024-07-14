@@ -14,7 +14,7 @@ const MainWrapper: React.FC<MainWrapperProps> = ({
     <div>
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold leading-7 text-zinc-900">
-          All {pageName}s
+          All {pageName === "Company" ? "Companies" : pageName + "s"}
         </h3>
         <RedirectButton
           label={`Add new ${pageName.toLowerCase()}`}

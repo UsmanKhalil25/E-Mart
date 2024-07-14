@@ -1,7 +1,7 @@
 "use server";
 import prisma from "@/lib/db";
 import { ProductFormSchema, ProductForm } from "@/lib/type";
-
+import { revalidatePath } from "next/cache";
 export async function create(newProduct: ProductForm) {
   try {
     const result = ProductFormSchema.safeParse(newProduct);
@@ -177,6 +177,7 @@ export async function update({ id, updatedProduct }: UpdateParams) {
       },
     });
 
+    revalidatePath(`/product/${id}`);
     return {
       status: 200,
       message: "Product updated successfully",

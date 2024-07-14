@@ -104,6 +104,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ existingProduct }) => {
     const response = await createProduct(result.data);
     if (response.status === 201) {
       toast.success(response.message);
+      router.push("/product");
     } else {
       toast.error(response.message);
     }
@@ -132,6 +133,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ existingProduct }) => {
       const response = await updateProduct(payload);
       if (response.status === 200) {
         toast.success(response.message);
+        router.push(`/product/${existingProduct?.id}`);
       } else {
         toast.error(response.message);
       }
@@ -145,7 +147,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ existingProduct }) => {
     } else {
       await createNewProduct(data);
     }
-    router.push("/product");
   };
 
   return (

@@ -11,6 +11,7 @@ const mainRoutes = [
   { name: "Products", path: "/product", requiresAuth: true },
   { name: "Customers", path: "/customer", requiresAuth: true },
   { name: "Sales", path: "/sale", requiresAuth: true },
+  { name: "Companies", path: "/company", requiresAuth: true },
 ];
 export default function Sidebar() {
   const pathname = usePathname();
@@ -40,22 +41,15 @@ export default function Sidebar() {
           {isLoading && (
             <div className="animate-spin rounded-full h-7 w-7 border-b-2 border-white/50  my-2"></div>
           )}
-          {user?.picture && (
-            <Image
-              src={user?.picture}
-              alt="Profile picture"
-              width={50}
-              height={50}
-              className="rounded-full  my-2"
-            />
-          )}
-          {user && !user.picture && (
-            <div className="h-7 w-7 rounded-full  my-2 bg-zinc-800 text-xs flex justify-center items-center">
+          {user && (
+            <div className="h-7 w-7 rounded-full  my-2 text-zinc-800 bg-zinc-100 font-semibold text-xs flex justify-center items-center">
               {user.given_name?.at(0)}
             </div>
           )}
           {user?.email && (
-            <p className="text-center text-xs mb-3">Logged in as{user.email}</p>
+            <p className="text-center text-xs mb-3">
+              Logged in as: {user.email}
+            </p>
           )}
           {isAuthenticated && (
             <LogoutLink className="py-3 px-5 text-center hover:bg-zinc-800 rounded-md transition inline-block w-full">

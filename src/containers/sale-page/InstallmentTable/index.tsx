@@ -33,16 +33,20 @@ const InstallmentTable: React.FC<InstallmentTableProps> = ({ sale }) => {
         <h2 className="text-sm text-gray-600">
           Click on a installment to update the payment
         </h2>
-        <RedirectButton
-          redirectionUrl={{
-            pathname: "/installment/new",
-            query: {
-              saleId: sale.id,
-              installmentPlan: sale.installmentPlan?.id,
-            },
-          }}
-          label="New installment"
-        />
+        {sale.installmentPlan?.remainingPrice
+          ? sale.installmentPlan?.remainingPrice > 0 && (
+              <RedirectButton
+                redirectionUrl={{
+                  pathname: "/installment/new",
+                  query: {
+                    saleId: sale.id,
+                    installmentPlan: sale.installmentPlan?.id,
+                  },
+                }}
+                label="New installment"
+              />
+            )
+          : null}
       </div>
       <div className="mt-4 overflow-x-auto rounded-md">
         <table className="table-auto w-full text-left whitespace-no-wrap">

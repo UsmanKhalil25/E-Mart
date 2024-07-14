@@ -102,6 +102,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
       toast.success(response.message);
       if (onSubmitCustomer) {
         onSubmitCustomer(response?.data);
+      } else {
+        router.push("/customer");
       }
     } else {
       toast.error(response.message);
@@ -131,6 +133,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
       const response = await updateCustomer(payload);
       if (response.status === 200) {
         toast.success(response.message);
+        router.push(`/customer/${existingCustomer?.id}`);
       } else {
         toast.error(response.message);
       }
@@ -143,7 +146,6 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
     } else {
       await createNewCustomer(data);
     }
-    router.push("/customer");
   };
 
   return (

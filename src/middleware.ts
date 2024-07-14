@@ -6,5 +6,10 @@ export default async function middlware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashoard", "/products"],
+  matcher: [
+    "/sale/:path*",
+    "/customer/:path*",
+    "/product/:path*",
+    "/dashboard",
+  ],
 };

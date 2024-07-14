@@ -30,6 +30,15 @@ export const TABLE_HEADER_SALES = [
   { key: "numberOfProducts", label: "Number of Product" },
 ];
 
+// getAll Companies
+export const TABLE_HEADER_COMPANIES = [
+  { key: "id", label: "#" },
+  { key: "companyName", label: "Company Name" },
+  { key: "numberOfProducts", label: "Number of Products" },
+  { key: "totalSaleAmount", label: "Total Sale Amount" },
+  { key: "totalPurchaseAmount", label: "Total Purchase Amount" },
+  { key: "totalStock", label: "Total Stock" },
+];
 // page: /sale/[id]
 export const TABLE_HEADER_SALE_PRODUCT = [
   { key: "key", label: "#" },
