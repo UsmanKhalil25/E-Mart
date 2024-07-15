@@ -161,14 +161,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ existingProduct }) => {
           </label>
           <div className="mt-2">
             <Select
-              instanceId={"wsad123wqwe"}
               options={companyOptions}
               onChange={(selectedOption) => {
                 setValue("company", selectedOption?.value || "");
               }}
               value={
                 companyOptions.find(
-                  (option) => option.value === existingProduct?.company.name
+                  (option) => option.value === watch("company")
                 ) || null
               }
             />
@@ -189,14 +188,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ existingProduct }) => {
           </label>
           <div className="mt-2">
             <Select
-              instanceId={"wsad123wqwe"}
               options={categoryOptions}
               onChange={(selectedOption) => {
                 setValue("category", selectedOption?.value || "");
               }}
               value={
                 categoryOptions.find(
-                  (option) => option.value === existingProduct?.category.name
+                  (option) => option.value === watch("category")
                 ) || null
               }
             />

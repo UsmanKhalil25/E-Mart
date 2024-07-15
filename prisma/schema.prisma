@@ -12,7 +12,7 @@ model Customer {
   firstName   String
   lastName    String?
   phoneNumber String    @unique
-  CNIC        String    @unique
+  CNIC        String?    
   address     Address?
   sales       Sale[]
   createdAt   DateTime  @default(now())
@@ -72,6 +72,7 @@ enum PaymentOption {
 
 model Sale {
   id              Int              @id @default(autoincrement())
+  date            DateTime
   customer        Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId      Int
   paymentStatus   PaymentStatus

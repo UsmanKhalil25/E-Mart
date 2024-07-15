@@ -163,6 +163,10 @@ const InvoicePdf: React.FC<InvoicePdfProps> = ({ sale }) => {
               <Text style={styles.boldText}>Address: </Text>
               {EMART_INFO.address}
             </Text>
+            <Text style={styles.text}>
+              <Text style={styles.boldText}>Sale date: </Text>
+              {sale.date.toDateString()}
+            </Text>
           </View>
           <View
             style={[

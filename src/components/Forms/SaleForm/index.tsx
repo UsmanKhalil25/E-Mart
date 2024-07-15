@@ -18,7 +18,6 @@ import { create as createSale } from "@/actions/sale/actions";
 import CustomerForm from "@/components/Forms/CustomerForm";
 import CustomerSearchBar from "@/components/Searchbars/CustomerSearchbar";
 import ProductSearchBar from "@/components/Searchbars/ProductSearchBar";
-import InstallmentForm from "@/components/Forms/InstallmentForm";
 import InstallmentPlanForm from "@/components/Forms/InstallmentPlanForm";
 import FullPaymentForm from "@/components/Forms/FullPaymentForm";
 import BookRecordForm from "@/components/Forms/BookRecordForm";
@@ -37,6 +36,7 @@ const SaleForm = () => {
     CUSTOMER_OPTIONS.NEW
   );
 
+  const [saleDate, setSaleDate] = useState<Date>();
   const [selectedCustomer, setSelectedCustomer] = useState<Customer>();
   const [selectedProducts, setSelectedProducts] = useState<ProductWithInfo[]>(
     []
@@ -168,12 +168,18 @@ const SaleForm = () => {
   }, [bookRecord]);
 
   const addRecord = async () => {
-    if (selectedCustomer && bookRecord && selectedProducts.length > 0) {
+    if (
+      selectedCustomer &&
+      bookRecord &&
+      selectedProducts.length > 0 &&
+      saleDate
+    ) {
       setIsSubmitting(true);
       let saleData: SaleFormType | undefined;
 
       if (paymentOption === PAYMENT_OPTIONS.FULL_PAYMENT && fullPayment) {
         saleData = {
+          date: saleDate,
           customerId: selectedCustomer.id,
           paymentOption: paymentOption,
           paymentInfo: fullPayment,
@@ -185,6 +191,7 @@ const SaleForm = () => {
         installmentPlan
       ) {
         saleData = {
+          date: saleDate,
           customerId: selectedCustomer.id,
           paymentOption: paymentOption,
           paymentInfo: installmentPlan,
@@ -371,6 +378,24 @@ const SaleForm = () => {
           ))}
 
         {installmentPlan || fullPayment ? (
+          <div className="sm:col-span-3">
+            <label
+              htmlFor="dueDate"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
+              Sale date
+            </label>
+            <div className="mt-2">
+              <input
+                type="date"
+                id="dueDate"
+                onChange={(event) => setSaleDate(new Date(event.target.value))}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-zinc-950 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+        ) : null}
+        {saleDate && (
           <>
             <div
               className={
@@ -384,7 +409,7 @@ const SaleForm = () => {
               onAddBookRecord={handleAddBookRecord}
             />
           </>
-        ) : null}
+        )}
       </fieldset>
     </div>
   );

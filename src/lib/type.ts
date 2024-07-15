@@ -67,12 +67,7 @@ export const CustomerFormSchema = z.object({
       /^\d{4}-\d{7}$/,
       "Please provide a valid phone number format (e.g., 0331-2340021)"
     ),
-  CNIC: z
-    .string()
-    .regex(
-      /^\d{5}-\d{8}$/,
-      "Please provide a valid CNIC format (e.g., 34202-00827441)"
-    ),
+  CNIC: z.string().optional(),
   address: AddressFormSchema.optional(),
 });
 export type CustomerForm = z.infer<typeof CustomerFormSchema>;
@@ -82,7 +77,7 @@ export type Customer = {
   firstName: string;
   lastName: string | null;
   phoneNumber: string;
-  CNIC: string;
+  CNIC: string | null;
   address: Address | null;
 };
 
@@ -206,6 +201,7 @@ export type PAYMENT_STATUS =
 
 export type Sale = {
   id: number;
+  date: Date;
   customerId: number;
   customer: Customer;
   paymentStatus: PAYMENT_STATUS;
@@ -220,6 +216,7 @@ export type Sale = {
 
 export type SaleForm = {
   customerId: number;
+  date: Date;
   paymentOption: PAYMENT_OPTIONS;
   paymentInfo: FullPaymentForm | InstallmentPlanForm;
   products: ProductWithInfo[];
@@ -228,6 +225,7 @@ export type SaleForm = {
 
 export type SaleAllType = {
   id: number;
+  date: Date;
   customerId: number;
   customer: {
     id: number;

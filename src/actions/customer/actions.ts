@@ -19,7 +19,10 @@ export async function create(newCustomer: CustomerForm) {
     const { address, ...customerData } = result.data;
     const customer = await prisma.customer.create({
       data: {
-        ...customerData,
+        firstName: customerData.firstName,
+        lastName: customerData.lastName,
+        CNIC: customerData?.CNIC,
+        phoneNumber: customerData.phoneNumber,
         address: address
           ? {
               create: {
@@ -122,12 +125,6 @@ export async function search({ field, query }: SearchParams) {
       case "phoneNumber":
         customers = await prisma.customer.findMany({
           where: { phoneNumber: { contains: query as string } },
-          include: { address: true },
-        });
-        break;
-      case "CNIC":
-        customers = await prisma.customer.findMany({
-          where: { CNIC: { contains: query as string } },
           include: { address: true },
         });
         break;

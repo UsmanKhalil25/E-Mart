@@ -94,11 +94,19 @@ const SaleDetailPage = async ({ params }: { params: { id: string } }) => {
             {formatPaymentStatus(sale.paymentStatus)}
           </span>
         </div>
-        <div className="text-xs font-light">
-          Payment Option:{" "}
-          <span className="font-semibold text-sm">
-            {formatPaymentOption(sale.paymentOption)}
-          </span>
+        <div className="flex flex-col ">
+          <div className="text-xs font-light">
+            Payment Option:{" "}
+            <span className="font-semibold text-sm">
+              {formatPaymentOption(sale.paymentOption)}
+            </span>
+          </div>
+          <div className="text-xs font-light">
+            Sale date:{" "}
+            <span className="font-semibold text-sm">
+              {sale.date.toDateString()}
+            </span>
+          </div>
         </div>
       </div>
       <CustomerDetailSection customer={sale.customer} />

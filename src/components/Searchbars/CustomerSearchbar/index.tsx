@@ -13,10 +13,6 @@ const USER_FIELDS = [
     id: "phoneNumber",
     label: "Phone Number",
   },
-  {
-    id: "CNIC",
-    label: "CNIC",
-  },
 ];
 
 interface CustomerSearchBarProps {
@@ -30,13 +26,6 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
   const [selectedField, setSelectedField] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [customers, setCustomers] = useState<Customer[] | undefined>(undefined);
-
-  const formatCNIC = (value: string) => {
-    const cnic = value.replace(/\D/g, "").slice(0, 13);
-    if (cnic.length <= 5) return cnic;
-    if (cnic.length <= 13) return `${cnic.slice(0, 5)}-${cnic.slice(5)}`;
-    return `${cnic.slice(0, 5)}-${cnic.slice(5, 12)}${cnic.slice(12)}`;
-  };
 
   const formatPhoneNumber = (value: string) => {
     const phone = value.replace(/\D/g, "").slice(0, 11);
@@ -52,9 +41,8 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
 
   const handleSearchQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
     let value = event.target.value;
-    if (selectedField === "CNIC") {
-      setSearchQuery(formatCNIC(value));
-    } else if (selectedField === "phoneNumber") {
+
+    if (selectedField === "phoneNumber") {
       setSearchQuery(formatPhoneNumber(value));
     } else if (selectedField === "firstName") {
       setSearchQuery(value);
@@ -154,14 +142,12 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
               >
                 <div>
                   <p className="text-gray-900 font-semibold text-sm">
-                    CNIC: {customer.CNIC}
-                  </p>
-                  <p className="text-gray-700 text-xs">
                     Name: {customer.firstName}
                   </p>
                   <p className="text-gray-700 text-xs">
                     Phone: {customer.phoneNumber}
                   </p>
+                  <p className="text-gray-700 text-xs">CNIC: {customer.CNIC}</p>
                 </div>
               </li>
             ))}

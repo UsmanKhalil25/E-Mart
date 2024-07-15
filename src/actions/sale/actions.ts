@@ -28,6 +28,7 @@ export async function create(newSale: SaleForm) {
     const sale = await prisma.sale.create({
       data: {
         customerId: newSale.customerId,
+        date: newSale.date,
         paymentStatus: paymentStatus,
         paymentOption: newSale.paymentOption,
       },
