@@ -180,13 +180,15 @@ const SaleDetailPage = async ({ params }: { params: { id: string } }) => {
               </div>
 
               <div className="bg-white shadow rounded-md p-4">
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-sm font-medium text-red-600">
                   Remaining Amount
                 </p>
-                <p className="text-lg font-semibold text-gray-900">
-                  {sale.installmentPlan?.remainingPrice
-                    ? formatPrice(sale.installmentPlan?.remainingPrice)
-                    : 0}
+                <p
+                  className={`text-lg font-semibold ${sale.installmentPlan?.remainingPrice !== undefined && sale.installmentPlan.remainingPrice > 0 ? "text-red-600" : "text-gray-900"}`}
+                >
+                  {sale.installmentPlan?.remainingPrice !== undefined
+                    ? formatPrice(sale.installmentPlan.remainingPrice)
+                    : ""}
                 </p>
               </div>
               <div className="bg-white shadow rounded-md p-4">

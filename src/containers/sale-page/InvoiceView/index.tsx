@@ -88,6 +88,11 @@ const InvoiceView: React.FC<InvoiceViewProps> = ({ sale }) => {
           padding: "16px",
           backgroundColor: "white",
           border: "1px solid black",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "90vh",
           marginTop: "20px",
         }}
       >

@@ -232,7 +232,7 @@ export type SaleAllType = {
     firstName: string;
     lastName: string | null;
     phoneNumber: string;
-    CNIC: string;
+    CNIC: string | null;
   };
   paymentStatus: PAYMENT_STATUS;
   paymentOption: PAYMENT_OPTIONS;
@@ -402,6 +402,60 @@ export type Installment = {
   paidAt: Date | null;
 };
 
+/*
+ * Purchase Payment form
+ */
+export const PurchasePaymentFormSchema = z.object({
+  totalAmount: z
+    .number({
+      required_error: "Please enter total amount",
+    })
+    .int()
+    .nonnegative({
+      message: "Payment cannot be negative",
+    }),
+  paidAmount: z
+    .number()
+    .int()
+    .nonnegative({ message: "Paid amount cannot be negative" }),
+});
+export type PurchasePaymentForm = z.infer<typeof PurchasePaymentFormSchema>;
+
+export type PurchaseForm = {
+  date: Date;
+  companyId: number;
+  description: string | undefined;
+  paymentInfo: PurchasePaymentForm;
+  products: ProductWithInfo[];
+};
+export type Purchase = {
+  id: number;
+  company: Company;
+  date: Date;
+  paymentStatus: PAYMENT_STATUS;
+  totalAmount: number;
+  paidAmount: number;
+  remainingAmount: number;
+  description: string | null;
+  productPurchases: ProductPurchase[];
+};
+
+export type ProductPurchase = {
+  id: number;
+  productId: number;
+  product: {
+    id: number;
+    model: string;
+    price: number;
+    stock: number;
+    description: string | null;
+    company: Company;
+    category: Category;
+  };
+  purchaseId: number;
+  quantity: number;
+  price: number;
+};
 /*
  * BookRecord schema
  */

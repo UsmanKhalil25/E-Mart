@@ -90,7 +90,7 @@ export async function create(newSale: SaleForm) {
         description: newSale.bookRecord.description,
       },
     });
-    return { status: 200, message: "Sale created successfully" };
+    return { status: 201, message: "Sale created successfully" };
   } catch (error) {
     console.error(error);
     return { status: 500, message: "Something went wrong" };

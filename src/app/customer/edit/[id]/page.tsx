@@ -15,7 +15,7 @@ const CustomerEditPage = async ({ params }: { params: { id: string } }) => {
   return (
     <DetailWrapper
       title={"Customer Information"}
-      description={"Let's add a new customer"}
+      description={"Let's edit a  customer"}
     >
       <CustomerForm existingCustomer={customer} />
     </DetailWrapper>

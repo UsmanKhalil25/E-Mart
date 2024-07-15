@@ -44,6 +44,17 @@ export const TABLE_HEADER_COMPANIES = [
   { key: "totalPurchaseAmount", label: "Total Purchase Amount" },
   { key: "totalStock", label: "Total Stock" },
 ];
+
+// getAll Purchase
+export const TABLE_HEADER_PURCHASES = [
+  { key: "id", label: "#" },
+  { key: "companyName", label: "Company Name" },
+  { key: "numberOfProducts", label: "Number of Products" },
+  { key: "totalAmount", label: "Total Amount" },
+  { key: "paidAmount", label: "Paid Amount" },
+  { key: "paymentStatus", label: "Payment Status" },
+];
+
 // page: /sale/[id]
 export const TABLE_HEADER_SALE_PRODUCT = [
   { key: "key", label: "#" },

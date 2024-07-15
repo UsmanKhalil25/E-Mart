@@ -23,7 +23,10 @@ const TableBody: React.FC<TableBodyProps> = ({
       {data?.map((item, index) => (
         <tr key={index} className="hover:bg-zinc-200">
           {columns.map((column) => (
-            <td key={`${index}-${column.key}`} className="px-4 py-2">
+            <td
+              key={`${index}-${column.key}`}
+              className="px-4 py-2 text-center"
+            >
               {redirectionUrl ? (
                 <Link
                   href={{

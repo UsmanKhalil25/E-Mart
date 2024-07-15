@@ -18,10 +18,12 @@ interface ProductsWithInfo {
 }
 interface ProductSearchBarProps {
   onProductSelected?: (productsWithInfo: ProductsWithInfo) => void;
+  stockContraint?: boolean;
 }
 
 const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
   onProductSelected,
+  stockContraint,
 }) => {
   const router = useRouter();
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -57,21 +59,27 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
         : router.push(`/product/${product.id}`);
     }
   };
+
+  const resetFields = () => {
+    setSelectedProduct(undefined);
+    setProducts(undefined);
+    setSearchQuery("");
+    setSelectedCompany("");
+    setSelectedCategory("");
+  };
   const handleSelectProduct = (quantityAndPrice: QuantityAndPrice) => {
-    if (selectedProduct) {
-      const productWithInfo = {
-        product: selectedProduct,
-        price: quantityAndPrice.price,
-        quantity: quantityAndPrice.quantity,
-      };
-      setSelectedProduct(undefined);
-      setProducts(undefined);
-      setSearchQuery("");
-      setSelectedCompany("");
-      setSelectedCategory("");
-      if (onProductSelected) {
-        onProductSelected(productWithInfo);
-      }
+    if (!selectedProduct) return;
+
+    const productWithInfo = {
+      product: selectedProduct,
+      price: quantityAndPrice.price,
+      quantity: quantityAndPrice.quantity,
+    };
+
+    resetFields();
+
+    if (onProductSelected) {
+      onProductSelected(productWithInfo);
     }
   };
 
@@ -213,6 +221,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
           initialPrice={selectedProduct.price}
           stock={selectedProduct.stock}
           onProductAdd={handleSelectProduct}
+          stockContraint={stockContraint}
         />
       )}
     </form>

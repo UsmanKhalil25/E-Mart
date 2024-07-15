@@ -8,12 +8,14 @@ interface QuantityAndPrice {
 interface ProductInputFormProps {
   initialPrice: number;
   stock: number;
+  stockContraint?: boolean;
   onProductAdd: (quantityAndPrice: QuantityAndPrice) => void;
 }
 
 const ProductSelectionForm: React.FC<ProductInputFormProps> = ({
   initialPrice,
   stock,
+  stockContraint,
   onProductAdd,
 }) => {
   const [price, setPrice] = useState<number>(initialPrice);
@@ -30,8 +32,16 @@ const ProductSelectionForm: React.FC<ProductInputFormProps> = ({
   }, [price]);
 
   const handleAddProduct = () => {
-    if (price && quantity && quantity <= stock) {
-      onProductAdd({ price, quantity });
+    if (!price || !quantity) return;
+
+    const product = { price, quantity };
+
+    if (stockContraint) {
+      if (quantity <= stock) {
+        onProductAdd(product);
+      }
+    } else {
+      onProductAdd(product);
     }
   };
 
@@ -44,7 +54,7 @@ const ProductSelectionForm: React.FC<ProductInputFormProps> = ({
     const newQuantity = parseInt(event.target.value);
     setQuantity(newQuantity);
 
-    if (newQuantity > stock) {
+    if (newQuantity > stock && stockContraint) {
       setQuantityError(`Quantity cannot exceed stock of ${stock}`);
     } else {
       setQuantityError("");

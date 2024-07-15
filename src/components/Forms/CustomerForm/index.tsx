@@ -133,11 +133,11 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
       const response = await updateCustomer(payload);
       if (response.status === 200) {
         toast.success(response.message);
+        setLoading(false);
         router.push(`/customer/${existingCustomer?.id}`);
       } else {
         toast.error(response.message);
       }
-      setLoading(false);
     }
   };
   const onSubmit = async (data: CustomerFormType) => {
