@@ -134,6 +134,7 @@ export async function update({ id, updatedPurchase }: UpdateParams) {
       message: "Paid amount cannot be greater then total amount.",
     };
   }
+
   try {
     const updatedPurchaseData = await prisma.purchase.update({
       where: {
@@ -144,8 +145,13 @@ export async function update({ id, updatedPurchase }: UpdateParams) {
         paidAmount: updatedPurchase.paidAmount,
         remainingAmount:
           updatedPurchase.totalAmount - updatedPurchase.paidAmount,
+        paymentStatus:
+          updatedPurchase.totalAmount - updatedPurchase.paidAmount === 0
+            ? PAYMENT_STATUS.COMPLETED
+            : PAYMENT_STATUS.PENDING,
       },
     });
+
     revalidatePath(`/purchase/${id}`);
 
     return {
