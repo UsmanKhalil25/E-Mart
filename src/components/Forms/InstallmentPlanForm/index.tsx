@@ -36,6 +36,7 @@ const InstallmentPlanForm: React.FC<InstallmentPlanFormProps> = ({
   const [formattedExpectedPayment, setFormattedExpectedPayment] =
     useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   useEffect(() => {
     const subscription = watch((value) => {
       const totalPrice = value.totalPrice ?? 0;
