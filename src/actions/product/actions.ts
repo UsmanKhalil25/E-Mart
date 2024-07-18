@@ -129,7 +129,7 @@ interface SearchParams {
   query: string;
 }
 export async function search({ company, category, query }: SearchParams) {
-  if (!company || !category || !query) {
+  if (!company || !category) {
     return { status: 400, message: "Field or query is missing", data: [] };
   }
   try {

@@ -30,7 +30,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[] | undefined>(undefined);
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(
-    undefined
+    undefined,
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCompany, setSelectedCompany] = useState<string>("");
@@ -85,7 +85,7 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
 
   const handleSearch = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!selectedCompany || !selectedCategory || !searchQuery) {
+    if (!selectedCompany || !selectedCategory) {
       return;
     }
     try {
@@ -144,7 +144,6 @@ const ProductSearchBar: React.FC<ProductSearchBarProps> = ({
             type="search"
             className="block border-0 w-full py-3 px-4 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-zinc-950"
             placeholder="Search product"
-            required
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
