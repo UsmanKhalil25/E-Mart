@@ -2,7 +2,7 @@
 import React, { FormEvent, useState, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { search as searchCustomer } from "@/actions/customer/actions";
-import { Customer } from "@/lib/type";
+import { Customer, Address } from "@/lib/type";
 
 const USER_FIELDS = [
   {
@@ -32,7 +32,9 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
     if (phone.length <= 4) return phone;
     return `${phone.slice(0, 4)}-${phone.slice(4)}`;
   };
-
+  const formattedAddress = (address: Address | null): string => {
+    return `${address?.detail}, ${address?.city}`;
+  };
   const handleFieldChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedField(event.target.value);
     setSearchQuery("");
@@ -148,6 +150,11 @@ const CustomerSearchBar: React.FC<CustomerSearchBarProps> = ({
                     Phone: {customer.phoneNumber}
                   </p>
                   <p className="text-gray-700 text-xs">CNIC: {customer.CNIC}</p>
+                </div>
+                <div>
+                  <p className="text-gray-900 font-semibold text-sm">
+                    Address: {formattedAddress(customer.address)}
+                  </p>
                 </div>
               </li>
             ))}
