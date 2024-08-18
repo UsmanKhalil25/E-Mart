@@ -2,7 +2,7 @@
 import React, { FormEvent, useState, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { search as searchSale } from "@/actions/sale/actions";
-import { Sale as SaleType } from "@/lib/type";
+import { Sale as SaleType, Address } from "@/lib/type";
 import {
   formatPaymentOption,
   formatPaymentStatus,
@@ -36,7 +36,9 @@ const SaleSearchBar = ({}) => {
     if (cnic.length <= 13) return `${cnic.slice(0, 5)}-${cnic.slice(5)}`;
     return `${cnic.slice(0, 5)}-${cnic.slice(5, 12)}${cnic.slice(12)}`;
   };
-
+  const formattedAddress = (address: Address | null): string => {
+    return `${address?.detail}, ${address?.city}`;
+  };
   const formatPhoneNumber = (value: string) => {
     const phone = value.replace(/\D/g, "").slice(0, 11);
     if (phone.length <= 4) return phone;
@@ -160,8 +162,8 @@ const SaleSearchBar = ({}) => {
                     {formatPrice(
                       sale.productSales.reduce(
                         (total, item) => total + item.price,
-                        0
-                      )
+                        0,
+                      ),
                     )}
                   </p>
                   {selectedField === "firstName" && (
@@ -179,6 +181,11 @@ const SaleSearchBar = ({}) => {
                       Phone: {sale.customer.phoneNumber}
                     </p>
                   )}
+                </div>
+                <div>
+                  <p className="text-gray-900 font-semibold text-sm">
+                    Address: {formattedAddress(sale.customer.address)}
+                  </p>
                 </div>
               </li>
             ))}
