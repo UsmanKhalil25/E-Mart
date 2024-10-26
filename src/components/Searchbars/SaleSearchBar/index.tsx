@@ -22,6 +22,10 @@ const USER_FIELDS = [
     id: "CNIC",
     label: "CNIC",
   },
+  {
+    id: "address",
+    label: "Address",
+  },
 ];
 
 const SaleSearchBar = ({}) => {
@@ -57,7 +61,7 @@ const SaleSearchBar = ({}) => {
       setSearchQuery(formatCNIC(value));
     } else if (selectedField === "phoneNumber") {
       setSearchQuery(formatPhoneNumber(value));
-    } else if (selectedField === "firstName") {
+    } else {
       setSearchQuery(value);
     }
   };
@@ -162,8 +166,8 @@ const SaleSearchBar = ({}) => {
                     {formatPrice(
                       sale.productSales.reduce(
                         (total, item) => total + item.price,
-                        0,
-                      ),
+                        0
+                      )
                     )}
                   </p>
                   {selectedField === "firstName" && (

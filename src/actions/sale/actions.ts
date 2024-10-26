@@ -200,10 +200,12 @@ interface SearchParams {
   field: string;
   query: string;
 }
+
 export async function search({ field, query }: SearchParams) {
   if (!field || !query) {
     return { status: 400, message: "Field or query is missing", data: [] };
   }
+
   try {
     let sales: Sale[] = [];
     switch (field) {
@@ -211,7 +213,7 @@ export async function search({ field, query }: SearchParams) {
         sales = await prisma.sale.findMany({
           where: {
             customer: {
-              firstName: { contains: query as string, mode: "insensitive" },
+              firstName: { contains: query, mode: "insensitive" },
             },
           },
           include: {
@@ -244,7 +246,7 @@ export async function search({ field, query }: SearchParams) {
         sales = await prisma.sale.findMany({
           where: {
             customer: {
-              phoneNumber: { contains: query as string },
+              phoneNumber: { contains: query },
             },
           },
           include: {
@@ -277,8 +279,44 @@ export async function search({ field, query }: SearchParams) {
         sales = await prisma.sale.findMany({
           where: {
             customer: {
-              CNIC: {
-                contains: query as string,
+              CNIC: { contains: query },
+            },
+          },
+          include: {
+            customer: {
+              include: {
+                address: true,
+              },
+            },
+            fullPayment: true,
+            installmentPlan: {
+              include: {
+                installments: true,
+              },
+            },
+            productSales: {
+              include: {
+                product: {
+                  include: {
+                    company: true,
+                    category: true,
+                  },
+                },
+              },
+            },
+            bookRecord: true,
+          },
+        });
+        break;
+      case "address":
+        sales = await prisma.sale.findMany({
+          where: {
+            customer: {
+              address: {
+                OR: [
+                  { city: { contains: query, mode: "insensitive" } },
+                  { detail: { contains: query, mode: "insensitive" } },
+                ],
               },
             },
           },
@@ -309,6 +347,7 @@ export async function search({ field, query }: SearchParams) {
         });
         break;
     }
+
     return {
       status: 200,
       message: "Sales fetched successfully",
