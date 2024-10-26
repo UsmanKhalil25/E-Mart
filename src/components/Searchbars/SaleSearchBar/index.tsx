@@ -85,6 +85,7 @@ const SaleSearchBar = ({}) => {
       });
       if (response.status === 200) {
         const salesData: SaleType[] = response.data;
+        console.log("salesData: ", salesData);
         setSales(salesData);
       }
     } catch (error) {
@@ -170,7 +171,8 @@ const SaleSearchBar = ({}) => {
                       )
                     )}
                   </p>
-                  {selectedField === "firstName" && (
+                  {(selectedField === "firstName" ||
+                    selectedField === "address") && (
                     <p className="text-gray-700 text-xs">
                       Name: {sale.customer.firstName}
                     </p>
